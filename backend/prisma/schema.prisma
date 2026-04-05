@@ -1,0 +1,321 @@
+// prisma/schema.prisma — RED TEP
+// Ejecutar: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT_TP    // Estudiante técnico diurno
+  STUDENT_EPJA  // Estudiante técnico vespertino
+  TEACHER       // Docente validador
+  COMPANY       // Empresa reclutadora
+  ADMIN         // Administración del colegio
+}
+
+enum Disponibilidad {
+  TIEMPO_COMPLETO
+  MEDIO_TIEMPO
+  FINES_DE_SEMANA
+  POR_DEFINIR
+}
+
+enum NivelCompetencia {
+  BAJO
+  MEDIO
+  ALTO
+}
+
+enum TipoInsignia {
+  PERFIL_COMPLETO
+  VALIDADO_POR_PROFESOR
+  EXPERIENCIA_PRACTICA
+  PRIMERA_POSTULACION
+  TOP_CANDIDATO
+}
+
+enum TipoMedia {
+  VIDEO
+  FOTO
+}
+
+// ─── Modelos ──────────────────────────────────────────────────────────────────
+
+model User {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  email     String   @unique
+  password  String
+  role      Role
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  worker          Worker?
+  company         Company?
+  validaciones    Validacion[] @relation("TeacherValidaciones")
+
+  @@map("users")
+}
+
+model Worker {
+  id                       Int              @id @default(autoincrement())
+  userId                   Int              @unique
+  user                     User             @relation(fields: [userId], references: [id])
+
+  // Datos personales
+  edad                     Int?
+  telefono                 String?
+  direccion                String?
+  fotoUrl                  String?
+
+  // Datos académicos
+  curso                    String?          // "4to Medio TP"
+  especialidad             String?          // "Electricidad", "Telecomunicaciones", etc.
+  establecimiento          String?          @default("C.E. Cardenal José María Caro")
+
+  // Perfil profesional
+  experienciaPractica      String?
+  disponibilidad           Disponibilidad?
+  videoUrl                 String?          // Video de práctica (Cloudinary)
+
+  // Evaluación socioemocional (JSON con puntajes 1-5)
+  evaluacionSocioem        Json?
+
+  // Progreso formativo (JSON con valores 0-100)
+  progreso                 Json?
+
+  // Personalización visual
+  bannerColor              String?
+
+  // Estado
+  perfilCompleto           Boolean          @default(false)
+  buscandoTrabajo          Boolean          @default(true)
+
+  // Relaciones
+  habilidades              Habilidad[]
+  validaciones             Validacion[]
+  insignias                Insignia[]
+  media                    Media[]
+  postulaciones            Postulacion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("workers")
+}
+
+model Habilidad {
+  id        Int    @id @default(autoincrement())
+  workerId  Int
+  worker    Worker @relation(fields: [workerId], references: [id])
+  nombre    String
+  categoria String  // "Técnica" | "Blanda"
+  nivel     Int?    // 1-5
+
+  @@map("habilidades")
+}
+
+model Validacion {
+  id          Int              @id @default(autoincrement())
+  workerId    Int
+  worker      Worker           @relation(fields: [workerId], references: [id])
+  teacherId   Int
+  teacher     User             @relation("TeacherValidaciones", fields: [teacherId], references: [id])
+  competencia String
+  nivel       NivelCompetencia
+  observacion String?
+  createdAt   DateTime         @default(now())
+
+  @@map("validaciones")
+}
+
+model Insignia {
+  id         Int          @id @default(autoincrement())
+  workerId   Int
+  worker     Worker       @relation(fields: [workerId], references: [id])
+  tipo       TipoInsignia
+  otorgadaEn DateTime     @default(now())
+
+  @@map("insignias")
+}
+
+model Media {
+  id          Int       @id @default(autoincrement())
+  workerId    Int
+  worker      Worker    @relation(fields: [workerId], references: [id])
+  url         String
+  tipo        TipoMedia
+  descripcion String?
+  vistas      Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  @@map("media")
+}
+
+model Company {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  user          User     @relation(fields: [userId], references: [id])
+  nombreEmpresa String
+  rut           String?
+  rubro         String?
+  comuna        String?
+  telefono      String?
+  sitioWeb      String?
+  logoUrl       String?
+  bannerColor   String?
+  aprobada                Boolean  @default(false)
+  verified                Boolean  @default(false)
+  verificationRequested   Boolean  @default(false)
+  createdAt               DateTime @default(now())
+
+  ofertas      Oferta[]
+
+  @@map("companies")
+}
+
+model Oferta {
+  id                    Int             @id @default(autoincrement())
+  companyId             Int
+  company               Company         @relation(fields: [companyId], references: [id])
+  cargo                 String
+  descripcion           String?
+  especialidadRequerida String?
+  comuna                String?
+  disponibilidad        Disponibilidad?
+  salario               String?
+  horario               String?
+  requisitos            String[]        // Array de strings
+  activa                Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+
+  postulaciones         Postulacion[]
+
+  @@map("ofertas")
+}
+
+model Postulacion {
+  id        Int      @id @default(autoincrement())
+  workerId  Int
+  worker    Worker   @relation(fields: [workerId], references: [id])
+  ofertaId  Int
+  oferta    Oferta   @relation(fields: [ofertaId], references: [id])
+  estado    String   @default("PENDIENTE") // PENDIENTE | REVISADO | ACEPTADO | RECHAZADO
+  createdAt DateTime @default(now())
+
+  @@unique([workerId, ofertaId])
+  @@map("postulaciones")
+}
+
+model Evento {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descripcion String?
+  fecha       DateTime
+  lugar       String?
+  creadoPor   String   // "COLEGIO" | "EMPRESA"
+  creadoPorId Int
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("eventos")
+}
+
+model EventoComment {
+  id          Int      @id @default(autoincrement())
+  eventoId    Int
+  authorId    Int
+  authorName  String
+  authorType  String   // "STUDENT" | "COMPANY" | "ADMIN"
+  content     String
+  createdAt   DateTime @default(now())
+
+  @@map("evento_comments")
+}
+
+model EventoReaction {
+  id       Int    @id @default(autoincrement())
+  eventoId Int
+  userId   Int
+  emoji    String @default("👍")
+
+  @@unique([eventoId, userId])
+  @@map("evento_reactions")
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  content     String
+  authorId    Int
+  authorType  String   // "STUDENT" | "COMPANY" | "ADMIN"
+  authorName  String
+  mediaUrl    String?
+  mediaType   String?  // "image" | "video"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("posts")
+}
+
+model PostReaction {
+  id     Int    @id @default(autoincrement())
+  postId Int
+  userId Int
+  emoji  String @default("👍")
+
+  @@unique([postId, userId])
+  @@map("post_reactions")
+}
+
+model PostComment {
+  id         Int      @id @default(autoincrement())
+  postId     Int
+  authorId   Int
+  authorName String
+  authorType String
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@map("post_comments")
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  type        String   // "FOLLOW" | "COMMENT" | "LIKE"
+  message     String
+  read        Boolean  @default(false)
+  referenceId Int?
+  createdAt   DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model FilterOption {
+  id        Int      @id @default(autoincrement())
+  tipo      String   // "especialidad"
+  valor     String
+  createdAt DateTime @default(now())
+
+  @@unique([tipo, valor])
+  @@map("filter_options")
+}

@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Paleta Institucional — C.E. Cardenal José María Caro · Lo Espejo ──────
+   Azul marino institucional  +  Magenta municipalidad Lo Espejo
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Fondos — escala azul marino oscuro */
+  --bg:        #07101e;
+  --bg2:       #0b1729;
+  --bg3:       #0f1f38;
+  --surface:   #13263f;
+  --surface2:  #192d4c;
+
+  /* Bordes */
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.13);
+
+  /* Azul institucional (primario) — reemplaza verde */
+  --green:     #1a4f8c;
+  --green-mid: #2665b5;
+  --green-lit: #4da0e8;
+  --green-glo: rgba(77,160,232,0.14);
+
+  /* Magenta Lo Espejo (acento) — usado en branding y detalles especiales */
+  --accent:    #be185d;
+  --accent-lit:#ec4899;
+  --accent-bg: rgba(190,24,93,0.11);
+
+  /* Dorado — logros, validaciones, admin */
+  --amber:     #c9940c;
+  --amber-lit: #f0bc38;
+  --amber-bg:  rgba(201,148,12,0.13);
+
+  /* Error */
+  --red:       #e05252;
+  --red-bg:    rgba(224,82,82,0.12);
+
+  /* Texto */
+  --text:      #ddeaf8;
+  --text2:     #6a9ec5;
+  --text3:     #3a5f7a;
+}
+
+/* ─── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Figtree', 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+/* ─── Animaciones ───────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .6; }
+}
+
+.fade-up   { animation: fadeUp  0.45s cubic-bezier(.16,1,.3,1) forwards; }
+.fade-in   { animation: fadeIn  0.35s ease forwards; }
+
+/* ─── Patrón de fondo sutil (grilla institucional) ──────────────────────────── */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(77,160,232,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,160,232,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Gradiente de marca ─────────────────────────────────────────────────────── */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--green-mid), var(--accent-lit));
+}
+
+/* ─── Glow azul institucional ────────────────────────────────────────────────── */
+.glow-blue {
+  box-shadow: 0 0 24px rgba(77,160,232,0.18), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ─── Feed 2 columnas (centro + derecha) ────────────────────────────────────── */
+.feed-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 640px) 260px;
+  grid-template-areas: "center right";
+  gap: 1.25rem;
+  align-items: start;
+  max-width: 940px;
+  width: 100%;
+}
+.feed-col-center { grid-area: center; }
+.feed-col-right  { grid-area: right;  position: sticky; top: 1rem; }
+
+@media (max-width: 860px) {
+  .feed-grid { grid-template-columns: 1fr; grid-template-areas: "center"; }
+  .feed-col-right { display: none; }
+}
+
+/* ─── Focus ring accesible ──────────────────────────────────────────────────── */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--green-lit);
+  outline-offset: 2px;
+}
