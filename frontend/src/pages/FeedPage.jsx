@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { Calendar, MapPin, ThumbsUp, MessageCircle, Building2, Users, Megaphone, X, Check } from 'lucide-react'
 import AppLayout from '../components/layout/AppLayout'
 import CreatePost from '../components/feed/CreatePost'
 import PostCard from '../components/feed/PostCard'
@@ -84,7 +85,7 @@ function EventCardFeed({ evento, likeState, onLike, onComment }) {
         background: 'linear-gradient(90deg, var(--green) 0%, #1a3a6e 100%)',
         padding: '4px 14px', display: 'flex', alignItems: 'center', gap: 6,
       }}>
-        <span style={{ fontSize: '.7rem' }}>📅</span>
+        <Calendar size={12} color="rgba(255,255,255,.8)" />
         <span style={{ fontSize: '.68rem', color: 'rgba(255,255,255,.8)', fontWeight: 600, letterSpacing: '.04em' }}>
           EVENTO
         </span>
@@ -111,8 +112,8 @@ function EventCardFeed({ evento, likeState, onLike, onComment }) {
               {evento.titulo}
             </div>
             {evento.lugar && (
-              <div style={{ fontSize: '.72rem', color: 'var(--text2)', marginTop: 2 }}>
-                📍 {evento.lugar}
+              <div style={{ fontSize: '.72rem', color: 'var(--text2)', marginTop: 2, display:'flex', alignItems:'center', gap:3 }}>
+                <MapPin size={11} /> {evento.lugar}
               </div>
             )}
             <div style={{ fontSize: '.68rem', color: 'var(--text3)', marginTop: 2 }}>
@@ -145,7 +146,7 @@ function EventCardFeed({ evento, likeState, onLike, onComment }) {
             fontSize: '.78rem', fontWeight: 500, transition: 'all .2s',
           }}
         >
-          👍 {reaction.count > 0 && <span>{reaction.count}</span>}
+          <ThumbsUp size={13}/> {reaction.count > 0 && <span>{reaction.count}</span>}
         </button>
         <button
           onClick={handleExpand}
@@ -156,7 +157,7 @@ function EventCardFeed({ evento, likeState, onLike, onComment }) {
             cursor: 'pointer', fontSize: '.78rem', fontWeight: 500,
           }}
         >
-          💬 {expanded ? 'Cerrar' : 'Comentar'}
+          <MessageCircle size={13}/> {expanded ? 'Cerrar' : 'Comentar'}
         </button>
       </div>
 
@@ -213,9 +214,9 @@ function EventCardFeed({ evento, likeState, onLike, onComment }) {
                         {(user?.id === c.authorId || isAdmin) && (
                           <button
                             onClick={() => handleDeleteComment(c.id)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', fontSize: '.75rem' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display:'flex', alignItems:'center' }}
                           >
-                            ✕
+                            <X size={12} />
                           </button>
                         )}
                       </div>
@@ -249,7 +250,7 @@ function UpcomingEventsCard({ eventos, navigate }) {
           fontFamily: "'Sora',sans-serif", fontWeight: 600, fontSize: '.8rem', color: 'var(--text)',
           display: 'flex', alignItems: 'center', gap: 6,
         }}>
-          <span>📅</span> Próximos eventos
+          <Calendar size={14} /> Próximos eventos
         </div>
         <button
           onClick={() => navigate('/eventos')}
@@ -285,8 +286,8 @@ function UpcomingEventsCard({ eventos, navigate }) {
                   {e.titulo}
                 </div>
                 {e.lugar && (
-                  <div style={{ fontSize: '.64rem', color: 'var(--text3)', marginTop: 1 }}>
-                    📍 {e.lugar}
+                  <div style={{ fontSize: '.64rem', color: 'var(--text3)', marginTop: 1, display:'flex', alignItems:'center', gap:2 }}>
+                    <MapPin size={10} /> {e.lugar}
                   </div>
                 )}
               </div>
@@ -317,7 +318,7 @@ function CompanyRecoCard({ companies }) {
         fontFamily: "'Sora',sans-serif", fontWeight: 600, fontSize: '.8rem', color: 'var(--text)',
         display: 'flex', alignItems: 'center', gap: 6,
       }}>
-        <span>🏢</span> Empresas del territorio
+        <Building2 size={14} /> Empresas del territorio
       </div>
       <div style={{ padding: '0 .75rem .75rem' }}>
         {shown.map((c, i) => (
@@ -342,7 +343,7 @@ function CompanyRecoCard({ companies }) {
               }}>
                 {c.nombreEmpresa}
                 {c.verified && (
-                  <span title="Verificada" style={{ color: 'var(--green-lit)', fontSize: '.65rem', flexShrink: 0 }}>✔</span>
+                  <Check size={11} title="Verificada" style={{ color: 'var(--green-lit)', flexShrink: 0 }} />
                 )}
               </div>
               {c.rubro && (
@@ -451,7 +452,7 @@ export default function FeedPage() {
               </div>
             ) : visibleItems.length === 0 ? (
               <EmptyState
-                icon={feedFilter === 'following' ? '👥' : '📢'}
+                icon={feedFilter === 'following' ? Users : Megaphone}
                 message={feedFilter === 'following' ? 'Sigue a alguien para ver su contenido aquí' : 'Sé el primero en publicar algo'}
               />
             ) : (

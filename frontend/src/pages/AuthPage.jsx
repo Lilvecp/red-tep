@@ -2,21 +2,22 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
+import { GraduationCap, Building2, Medal, Camera } from 'lucide-react'
 import { authService } from '../services'
 import useAuthStore from '../store/authStore'
 
 const inp = {
   width: '100%', padding: '10px 14px',
-  background: 'rgba(255,255,255,.05)',
-  border: '1px solid rgba(255,255,255,.1)',
-  borderRadius: 9, color: '#e2edf8',
+  background: 'var(--surface)',
+  border: '1px solid var(--border2)',
+  borderRadius: 9, color: 'var(--text)',
   fontFamily: "'Figtree',sans-serif", fontSize: '.875rem',
   outline: 'none', transition: 'border-color .2s',
 }
 const lbl = {
   display: 'block', fontSize: '.74rem',
   fontWeight: 500, marginBottom: 5,
-  color: 'rgba(255,255,255,.55)',
+  color: 'var(--text2)',
 }
 
 export default function AuthPage() {
@@ -129,13 +130,13 @@ export default function AuthPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
-                  ['🎓', 'Perfil técnico validado por profesores'],
-                  ['🏢', 'Conexión directa con empresas'],
-                  ['🏅', 'Sistema de insignias y progreso'],
-                  ['📸', 'Portafolio de prácticas y evidencias'],
-                ].map(([icon, text]) => (
+                  [GraduationCap, 'Perfil técnico validado por profesores'],
+                  [Building2,     'Conexión directa con empresas'],
+                  [Medal,         'Sistema de insignias y progreso'],
+                  [Camera,        'Portafolio de prácticas y evidencias'],
+                ].map(([Icon, text]) => (
                   <div key={text} style={{ display:'flex', alignItems:'center', gap:8, fontSize:'.8rem', color:'rgba(255,255,255,.75)' }}>
-                    <span style={{ fontSize: '.9rem' }}>{icon}</span>
+                    <Icon size={14} strokeWidth={2} />
                     {text}
                   </div>
                 ))}
@@ -154,7 +155,7 @@ export default function AuthPage() {
 
           {/* ── Panel derecho — Formulario ────────────────────────────────── */}
           <div style={{ background: 'var(--bg2)', padding: '3rem' }}>
-            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.2rem', color:'#fff', marginBottom:'.25rem' }}>
+            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.2rem', color:'var(--text)', marginBottom:'.25rem' }}>
               Bienvenido a RED TEP
             </div>
             <div style={{ fontSize:'.82rem', color:'var(--text2)', marginBottom:'1.75rem', fontFamily:"'Figtree',sans-serif" }}>
@@ -189,7 +190,7 @@ export default function AuthPage() {
                   <label style={lbl}>Correo electrónico</label>
                   <input style={inp} type="email" placeholder="correo@ejemplo.cl"
                     onFocus={e=>e.target.style.borderColor='var(--green-lit)'}
-                    onBlur={e=>e.target.style.borderColor='rgba(255,255,255,.1)'}
+                    onBlur={e=>e.target.style.borderColor='var(--border2)'}
                     {...lf.register('email', { required:true })}
                   />
                 </div>
@@ -197,7 +198,7 @@ export default function AuthPage() {
                   <label style={lbl}>Contraseña</label>
                   <input style={inp} type="password" placeholder="••••••••"
                     onFocus={e=>e.target.style.borderColor='var(--green-lit)'}
-                    onBlur={e=>e.target.style.borderColor='rgba(255,255,255,.1)'}
+                    onBlur={e=>e.target.style.borderColor='var(--border2)'}
                     {...lf.register('password', { required:true })}
                   />
                 </div>
@@ -223,16 +224,16 @@ export default function AuthPage() {
                   <div style={{ fontSize:'.68rem', color:'var(--text3)', marginBottom:'.5rem', textTransform:'uppercase', letterSpacing:'.06em' }}>Acceso rápido (demo)</div>
                   <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
                     {[
-                      ['admin@redtep.cl',          'admin123', '🏫 Admin Colegio'],
-                      ['juan@redtep.cl',            'est123',   '👷 Estudiante'],
-                      ['empresa@constructora.cl',   'emp123',   '🏢 Empresa'],
+                      ['admin@redtep.cl',          'admin123', 'Admin Colegio'],
+                      ['juan@redtep.cl',            'est123',   'Estudiante'],
+                      ['empresa@constructora.cl',   'emp123',   'Empresa'],
                     ].map(([e, p, l]) => (
                       <button
                         key={e} type="button"
                         onClick={() => { lf.setValue('email',e); lf.setValue('password',p) }}
                         style={{
                           display:'flex', alignItems:'center', justifyContent:'space-between',
-                          padding:'7px 10px', background:'rgba(255,255,255,.03)',
+                          padding:'7px 10px', background:'var(--surface2)',
                           border:'1px solid var(--border)', borderRadius:7,
                           color:'var(--text2)', fontFamily:"'Figtree',sans-serif",
                           fontSize:'.74rem', cursor:'pointer', transition:'border-color .15s',
@@ -260,7 +261,7 @@ export default function AuthPage() {
                       style={{ ...inp, ...(rf.formState.errors[regKey] && { borderColor:'rgba(239,68,68,.6)' }) }}
                       type={type} placeholder={placeholder}
                       onFocus={e=>e.target.style.borderColor='var(--green-lit)'}
-                      onBlur={e=>e.target.style.borderColor=rf.formState.errors[regKey]?'rgba(239,68,68,.6)':'rgba(255,255,255,.1)'}
+                      onBlur={e=>e.target.style.borderColor=rf.formState.errors[regKey]?'rgba(239,68,68,.6)':'var(--border2)'}
                       {...rf.register(regKey, {
                       required: 'Campo requerido',
                       ...(regKey === 'email' && { pattern: { value:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message:'Correo inválido (debe tener .com, .cl, etc.)' } }),
@@ -279,7 +280,7 @@ export default function AuthPage() {
                   <select
                     style={{ ...inp, cursor:'pointer' }}
                     onFocus={e=>e.target.style.borderColor='var(--green-lit)'}
-                    onBlur={e=>e.target.style.borderColor='rgba(255,255,255,.1)'}
+                    onBlur={e=>e.target.style.borderColor='var(--border2)'}
                     {...rf.register('role', { required:true })}
                   >
                     <option value="">Selecciona tu perfil...</option>

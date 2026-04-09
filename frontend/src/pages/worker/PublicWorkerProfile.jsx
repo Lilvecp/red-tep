@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { User, Megaphone, Film } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { Avatar, Badge, Chip, EmptyState } from '../../components/ui'
 import { workerService, postService, followService } from '../../services'
@@ -77,7 +78,7 @@ export default function PublicWorkerProfile() {
   if (!worker) {
     return (
       <AppLayout title="Perfil">
-        <EmptyState icon="👤" message="Perfil no encontrado" />
+        <EmptyState icon={User} message="Perfil no encontrado" />
       </AppLayout>
     )
   }
@@ -280,7 +281,7 @@ export default function PublicWorkerProfile() {
         {tab === 'publicaciones' && (
           <div>
             {posts.length === 0 ? (
-              <EmptyState icon="📢" message="Este estudiante aún no ha publicado nada" />
+              <EmptyState icon={Megaphone} message="Este estudiante aún no ha publicado nada" />
             ) : (
               posts.map(post => (
                 <PostCard
@@ -298,7 +299,7 @@ export default function PublicWorkerProfile() {
         {tab === 'media' && (
           <div>
             {!worker.media?.length ? (
-              <EmptyState icon="🎬" message="Sin fotos o videos de práctica subidos" />
+              <EmptyState icon={Film} message="Sin fotos o videos de práctica subidos" />
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
                 {worker.media.map(m => (

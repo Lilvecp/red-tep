@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import { Mail, Phone, MapPin, Clock, Camera, Loader, Lock, LockOpen, Medal, CheckCircle, Film, Briefcase, Star, Wrench, ClipboardList, X, Globe, Check } from 'lucide-react'
 import AppLayout from '../components/layout/AppLayout'
 import { Avatar, Badge, Chip, BtnGreen, BtnOutline, ProgressBar, SectionTitle, StatCard, EmptyState } from '../components/ui/index'
 import { workerService, companyService, adminService, ofertaService, eventoService, mediaService, followService } from '../services/index'
@@ -146,9 +147,9 @@ function StudentProfile({ user, setPhotoUrl }) {
                 onClick={() => filePhotoRef.current?.click()}
                 title={photoUploading ? 'Subiendo...' : 'Cambiar foto'}
                 disabled={photoUploading}
-                style={{ position:'absolute', bottom:0, right:-6, background:'var(--green-mid)', border:'2px solid rgba(0,0,0,.3)', borderRadius:'50%', width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:'.65rem', color:'#fff' }}
+                style={{ position:'absolute', bottom:0, right:-6, background:'var(--green-mid)', border:'2px solid rgba(0,0,0,.3)', borderRadius:'50%', width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff' }}
               >
-                {photoUploading ? '⏳' : '📷'}
+                {photoUploading ? <Loader size={12}/> : <Camera size={12}/>}
               </button>
               <input ref={filePhotoRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handlePhotoUpload}/>
             </div>
@@ -161,13 +162,13 @@ function StudentProfile({ user, setPhotoUrl }) {
           </div>
           <div style={{ padding:'1rem' }}>
             {[
-              ['📧', user?.email],
-              ['📞', worker?.telefono || 'No registrado'],
-              ['📍', worker?.direccion || 'No registrado'],
-              ['🕐', worker?.disponibilidad?.replace(/_/g,' ') || 'Por definir'],
-            ].map(([icon, val]) => (
-              <div key={icon} style={{ display:'flex', alignItems:'center', gap:7, fontSize:'.76rem', color:'var(--text2)', marginBottom:'.45rem' }}>
-                <span>{icon}</span>{val}
+              [Mail,   user?.email],
+              [Phone,  worker?.telefono || 'No registrado'],
+              [MapPin, worker?.direccion || 'No registrado'],
+              [Clock,  worker?.disponibilidad?.replace(/_/g,' ') || 'Por definir'],
+            ].map(([Icon, val]) => (
+              <div key={val} style={{ display:'flex', alignItems:'center', gap:7, fontSize:'.76rem', color:'var(--text2)', marginBottom:'.45rem' }}>
+                <Icon size={13} strokeWidth={1.8} />{val}
               </div>
             ))}
             <div style={{ marginTop:'.75rem', paddingTop:'.75rem', borderTop:'1px solid var(--border)' }}>
@@ -216,7 +217,9 @@ function StudentProfile({ user, setPhotoUrl }) {
               <div key={key} style={{ marginBottom:'.55rem' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', fontSize:'.72rem', marginBottom:3 }}>
                   <span style={{ color:'var(--text2)' }}>{label}</span>
-                  <span style={{ color: val >= 100 ? 'var(--amber-lit)' : 'var(--green-lit)' }}>{val}%{unlocks ? ' 🔓' : ''}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:2, color: val >= 100 ? 'var(--amber-lit)' : 'var(--green-lit)' }}>
+                    <span>{val}%</span>{unlocks && <LockOpen size={10}/>}
+                  </div>
                 </div>
                 <div style={{ height:5, borderRadius:3, background:'var(--surface2)' }}>
                   <div style={{ height:5, borderRadius:3, background: val >= 100 ? 'var(--amber)' : 'var(--green-mid)', width:`${val}%`, transition:'width .3s' }}/>
@@ -231,17 +234,19 @@ function StudentProfile({ user, setPhotoUrl }) {
           <SectionTitle>Insignias</SectionTitle>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:6 }}>
             {[
-              { tipo:'PERFIL_COMPLETO',       icon:'🏅', label:'Perfil',    hint:'Perfil técnico 100%' },
-              { tipo:'VALIDADO_POR_PROFESOR',  icon:'✅', label:'Validado',  hint:'Asignada por docente' },
-              { tipo:'EXPERIENCIA_PRACTICA',   icon:'🎬', label:'Práctica',  hint:'Prácticas 100%' },
-              { tipo:'PRIMERA_POSTULACION',    icon:'💼', label:'1ª Post.',  hint:'Primera postulación' },
-              { tipo:'TOP_CANDIDATO',          icon:'⭐', label:'Top',       hint:'Habilidades 100%' },
-            ].map(({ tipo, icon, label, hint }) => {
+              { tipo:'PERFIL_COMPLETO',       icon:Medal,        label:'Perfil',   hint:'Perfil técnico 100%' },
+              { tipo:'VALIDADO_POR_PROFESOR',  icon:CheckCircle,  label:'Validado', hint:'Asignada por docente' },
+              { tipo:'EXPERIENCIA_PRACTICA',   icon:Film,         label:'Práctica', hint:'Prácticas 100%' },
+              { tipo:'PRIMERA_POSTULACION',    icon:Briefcase,    label:'1ª Post.', hint:'Primera postulación' },
+              { tipo:'TOP_CANDIDATO',          icon:Star,         label:'Top',      hint:'Habilidades 100%' },
+            ].map(({ tipo, icon: Icon, label, hint }) => {
               const earned = worker?.insignias?.some(i => i.tipo === tipo)
               return (
                 <div key={tipo} title={hint} style={{ background: earned ? 'var(--amber-bg)' : 'var(--surface2)', border:`1px solid ${earned ? 'rgba(212,160,23,.3)' : 'var(--border)'}`, borderRadius:8, padding:'.55rem', textAlign:'center', cursor:'help' }}>
-                  <div style={{ fontSize:'1.1rem' }}>{earned ? icon : '🔒'}</div>
-                  <div style={{ fontSize:'.58rem', color: earned ? 'var(--amber-lit)' : 'var(--text3)', marginTop:2 }}>{label}</div>
+                  <div style={{ display:'flex', justifyContent:'center', marginBottom:2, color: earned ? 'var(--amber-lit)' : 'var(--text3)' }}>
+                    {earned ? <Icon size={20}/> : <Lock size={20}/>}
+                  </div>
+                  <div style={{ fontSize:'.58rem', color: earned ? 'var(--amber-lit)' : 'var(--text3)' }}>{label}</div>
                 </div>
               )
             })}
@@ -315,9 +320,9 @@ function StudentProfile({ user, setPhotoUrl }) {
                 Al llegar a 100% se desbloquean insignias automáticamente al guardar.
               </div>
               {[
-                { key:'perfilTecnico', label:'Perfil técnico',  badge:'🏅 Perfil completo' },
-                { key:'habilidades',   label:'Habilidades',     badge:'⭐ Top candidato' },
-                { key:'practicas',     label:'Prácticas',       badge:'🎬 Práctica completa' },
+                { key:'perfilTecnico', label:'Perfil técnico',  badge:'Perfil completo' },
+                { key:'habilidades',   label:'Habilidades',     badge:'Top candidato' },
+                { key:'practicas',     label:'Prácticas',       badge:'Práctica completa' },
                 { key:'portafolio',    label:'Portafolio',      badge: null },
               ].map(({ key, label, badge }) => (
                 <div key={key} style={{ marginBottom:'.75rem' }}>
@@ -376,8 +381,8 @@ function StudentProfile({ user, setPhotoUrl }) {
                   </select>
                   <button
                     onClick={() => setHabilidadesEdit(h => h.filter((_,j)=>j!==i))}
-                    style={{ background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.3)', color:'rgba(239,68,68,.8)', borderRadius:6, padding:'4px 8px', cursor:'pointer', fontSize:'.75rem' }}
-                  >✕</button>
+                    style={{ background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.3)', color:'rgba(239,68,68,.8)', borderRadius:6, padding:'4px 8px', cursor:'pointer', display:'flex', alignItems:'center' }}
+                  ><X size={13}/></button>
                 </div>
               ))
           ) : (
@@ -400,7 +405,7 @@ function StudentProfile({ user, setPhotoUrl }) {
                   ))}
                 </tbody>
               </table>
-            ) : <EmptyState icon="🔧" message="Sin habilidades registradas. Edita tu perfil para agregarlas."/>
+            ) : <EmptyState icon={Wrench} message="Sin habilidades registradas. Edita tu perfil para agregarlas."/>
           )}
         </div>
 
@@ -419,7 +424,7 @@ function StudentProfile({ user, setPhotoUrl }) {
             </div>
           </div>
           {filteredMedia.length === 0 ? (
-            <EmptyState icon="🎬" message="Aún no has subido videos ni fotos"/>
+            <EmptyState icon={Film} message="Aún no has subido videos ni fotos"/>
           ) : (
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:8 }}>
               {filteredMedia.map(m => (
@@ -449,7 +454,7 @@ function StudentProfile({ user, setPhotoUrl }) {
                 </div>
               ))}
             </div>
-          ) : <EmptyState icon="💼" message="Aún no has postulado a ninguna oferta"/>}
+          ) : <EmptyState icon={Briefcase} message="Aún no has postulado a ninguna oferta"/>}
         </div>
       </div>
     </div>
@@ -573,9 +578,9 @@ function CompanyProfile({ user, setPhotoUrl }) {
                 onClick={() => fileLogoRef.current?.click()}
                 title={logoUploading ? 'Subiendo...' : 'Cambiar logo'}
                 disabled={logoUploading}
-                style={{ position:'absolute', bottom:-4, right:-8, background:'var(--green-mid)', border:'2px solid rgba(0,0,0,.3)', borderRadius:'50%', width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:'.65rem', color:'#fff' }}
+                style={{ position:'absolute', bottom:-4, right:-8, background:'var(--green-mid)', border:'2px solid rgba(0,0,0,.3)', borderRadius:'50%', width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff' }}
               >
-                {logoUploading ? '⏳' : '📷'}
+                {logoUploading ? <Loader size={12}/> : <Camera size={12}/>}
               </button>
               <input ref={fileLogoRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleLogoUpload}/>
             </div>
@@ -587,13 +592,13 @@ function CompanyProfile({ user, setPhotoUrl }) {
           </div>
           <div style={{ padding:'1rem' }}>
             {[
-              ['📧', user?.email],
-              ['📞', company?.telefono || 'No registrado'],
-              ['📍', company?.comuna   || 'No registrada'],
-              ['🌐', company?.sitioWeb || 'Sin sitio web'],
-            ].map(([icon, val]) => (
-              <div key={icon} style={{ display:'flex', alignItems:'center', gap:7, fontSize:'.76rem', color:'var(--text2)', marginBottom:'.45rem' }}>
-                <span>{icon}</span>{val}
+              [Mail,   user?.email],
+              [Phone,  company?.telefono || 'No registrado'],
+              [MapPin, company?.comuna   || 'No registrada'],
+              [Globe,  company?.sitioWeb || 'Sin sitio web'],
+            ].map(([Icon, val]) => (
+              <div key={val} style={{ display:'flex', alignItems:'center', gap:7, fontSize:'.76rem', color:'var(--text2)', marginBottom:'.45rem' }}>
+                <Icon size={13} strokeWidth={1.8} />{val}
               </div>
             ))}
 
@@ -614,8 +619,8 @@ function CompanyProfile({ user, setPhotoUrl }) {
             {!company?.verified && (
               <div style={{ marginTop:'.5rem' }}>
                 {company?.verificationRequested ? (
-                  <div style={{ textAlign:'center', fontSize:'.72rem', color:'var(--amber-lit)', padding:'.5rem', background:'var(--amber-bg)', borderRadius:8 }}>
-                    ⏳ Verificación en revisión
+                  <div style={{ textAlign:'center', fontSize:'.72rem', color:'var(--amber-lit)', padding:'.5rem', background:'var(--amber-bg)', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', gap:4 }}>
+                    <Loader size={12}/> Verificación en revisión
                   </div>
                 ) : (
                   <button
@@ -627,7 +632,7 @@ function CompanyProfile({ user, setPhotoUrl }) {
                       fontWeight:500, cursor:'pointer', opacity: reqLoading ? .6 : 1,
                     }}
                   >
-                    {reqLoading ? 'Enviando...' : '✔ Solicitar verificación'}
+                    {reqLoading ? 'Enviando...' : <><Check size={12}/> Solicitar verificación</>}
                   </button>
                 )}
               </div>
@@ -695,7 +700,7 @@ function CompanyProfile({ user, setPhotoUrl }) {
           </div>
 
           {ofertas.length === 0 ? (
-            <EmptyState icon="📋" message="No has publicado ninguna oferta"/>
+            <EmptyState icon={ClipboardList} message="No has publicado ninguna oferta"/>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
               {ofertas.map(o => (
@@ -722,7 +727,7 @@ function CompanyProfile({ user, setPhotoUrl }) {
       {modal && (
         <div onClick={e=>{ if(e.target===e.currentTarget) setModal(false) }} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.6)', backdropFilter:'blur(4px)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:16, padding:'2rem', width:'100%', maxWidth:500, maxHeight:'90vh', overflowY:'auto' }}>
-            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.1rem', color:'#fff', marginBottom:'1.5rem' }}>Publicar nueva oferta</div>
+            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.1rem', color:'var(--text)', marginBottom:'1.5rem' }}>Publicar nueva oferta</div>
             {[['Cargo / Título del puesto','cargo'],['Especialidad requerida','especialidadRequerida'],['Comuna','comuna'],['Salario','salario'],['Horario','horario']].map(([label, key]) => (
               <div key={key} style={{ marginBottom:'.75rem' }}>
                 <label style={lbl}>{label}</label>
@@ -777,7 +782,7 @@ function AdminProfile({ user }) {
   const handleVerify = async (id) => {
     try {
       const { data } = await adminService.verifyCompany(id)
-      toast.success('Empresa verificada ✔')
+      toast.success('Empresa verificada')
       setCompanies(prev => prev.filter(c => c.id !== id))
     } catch { toast.error('Error') }
   }
@@ -826,9 +831,9 @@ function AdminProfile({ user }) {
                 </div>
                 <button
                   onClick={() => handleVerify(c.id)}
-                  style={{ padding:'4px 12px', borderRadius:7, border:'1px solid rgba(77,160,232,.3)', background:'var(--green-glo)', color:'var(--green-lit)', fontSize:'.72rem', fontWeight:500, cursor:'pointer' }}
+                  style={{ display:'flex', alignItems:'center', gap:4, padding:'4px 12px', borderRadius:7, border:'1px solid rgba(42,51,83,.2)', background:'var(--green-glo)', color:'var(--green-lit)', fontSize:'.72rem', fontWeight:500, cursor:'pointer' }}
                 >
-                  ✔ Verificar
+                  <Check size={12}/> Verificar
                 </button>
               </div>
             ))

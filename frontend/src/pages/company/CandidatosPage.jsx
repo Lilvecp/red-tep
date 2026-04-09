@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { Users } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { Avatar, Badge, Chip, BtnGreen, EmptyState } from '../../components/ui'
 import { workerService, filterService } from '../../services'
@@ -60,7 +61,7 @@ export default function CandidatosPage() {
           {loading ? (
             <div style={{ color: 'var(--text2)', padding: '2rem', textAlign: 'center' }}>Cargando...</div>
           ) : workers.length === 0 ? (
-            <EmptyState icon="👥" message="No hay candidatos con esos filtros." />
+            <EmptyState icon={Users} message="No hay candidatos con esos filtros." />
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {workers.map(w => (

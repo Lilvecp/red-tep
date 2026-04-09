@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { toast } from 'react-hot-toast'
+import { Video, Image, PenLine, X } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import { postService, mediaService } from '../../services/index'
 import { Avatar, BtnGreen } from '../ui/index'
@@ -96,7 +97,7 @@ export default function CreatePost({ onCreated }) {
                 ? <video src={preview.localUrl} style={{ width:'100%', maxHeight:240, objectFit:'cover' }} controls/>
                 : <img src={preview.localUrl} alt="preview" style={{ width:'100%', maxHeight:240, objectFit:'cover', display:'block' }}/>
               }
-              <button onClick={removePreview} style={{ position:'absolute', top:6, right:6, background:'rgba(0,0,0,.6)', border:'none', color:'#fff', borderRadius:'50%', width:24, height:24, cursor:'pointer', fontSize:'.8rem', display:'flex', alignItems:'center', justifyContent:'center' }}>✕</button>
+              <button onClick={removePreview} style={{ position:'absolute', top:6, right:6, background:'rgba(0,0,0,.6)', border:'none', color:'#fff', borderRadius:'50%', width:24, height:24, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}><X size={13} /></button>
             </div>
           )}
 
@@ -116,9 +117,9 @@ export default function CreatePost({ onCreated }) {
         <input ref={videoRef} type="file" accept="video/*" style={{ display:'none' }} onChange={handleFile}/>
         <input ref={photoRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleFile}/>
         {[
-          { icon:'🎥', label:'Video',    ref: videoRef, accept:'video/*' },
-          { icon:'🖼',  label:'Foto',     ref: photoRef, accept:'image/*' },
-          { icon:'✏️',  label:'Artículo', action: () => setFocused(true) },
+          { icon: Video,   label:'Video',    ref: videoRef },
+          { icon: Image,   label:'Foto',     ref: photoRef },
+          { icon: PenLine, label:'Artículo', action: () => setFocused(true) },
         ].map(btn => (
           <button
             key={btn.label}
@@ -132,7 +133,7 @@ export default function CreatePost({ onCreated }) {
             onMouseEnter={e => { e.currentTarget.style.background='var(--surface)'; e.currentTarget.style.color='var(--green-lit)' }}
             onMouseLeave={e => { e.currentTarget.style.background='none';           e.currentTarget.style.color='var(--text2)' }}
           >
-            <span style={{ fontSize:'.88rem' }}>{btn.icon}</span>
+            <btn.icon size={15} strokeWidth={2} />
             <span>{btn.label}</span>
           </button>
         ))}

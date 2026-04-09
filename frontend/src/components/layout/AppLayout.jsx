@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
+import { Search, Home, Calendar, Briefcase, Users, Bell, User, ThumbsUp, MessageCircle } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import { companyService, notificationService, followService, workerService } from '../../services/index'
 
@@ -45,7 +46,7 @@ function GlobalSearch() {
   return (
     <div ref={ref} style={{ position: 'relative', flex: 1, maxWidth: 340 }}>
       <div style={{ position: 'relative' }}>
-        <span style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', fontSize:'.82rem', color:'var(--text3)', pointerEvents:'none' }}>🔍</span>
+        <span style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'var(--text3)', pointerEvents:'none', display:'flex', alignItems:'center' }}><Search size={14}/></span>
         <input
           value={q}
           onChange={handleChange}
@@ -120,14 +121,14 @@ function GlobalSearch() {
 
 // ─── Menus ────────────────────────────────────────────────────────────────────
 const MENU_COMMON = [
-  { icon: '🏠', label: 'Feed',    path: '/feed' },
-  { icon: '📅', label: 'Eventos', path: '/eventos' },
+  { icon: Home,     label: 'Feed',    path: '/feed' },
+  { icon: Calendar, label: 'Eventos', path: '/eventos' },
 ]
 
 const MENU_BY_ROLE = {
-  STUDENT_TP:   [{ icon: '💼', label: 'Oportunidades', path: '/ofertas' }],
-  STUDENT_EPJA: [{ icon: '💼', label: 'Oportunidades', path: '/ofertas' }],
-  COMPANY:      [{ icon: '👥', label: 'Candidatos',    path: '/candidatos' }],
+  STUDENT_TP:   [{ icon: Briefcase, label: 'Oportunidades', path: '/ofertas' }],
+  STUDENT_EPJA: [{ icon: Briefcase, label: 'Oportunidades', path: '/ofertas' }],
+  COMPANY:      [{ icon: Users,     label: 'Candidatos',    path: '/candidatos' }],
 }
 
 const ADMIN_ROLES = ['ADMIN']
@@ -177,7 +178,7 @@ function NavItem({ item, active, onClick }) {
       onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,.04)' }}
       onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
     >
-      <span style={{ fontSize: '.95rem', lineHeight: 1 }}>{item.icon}</span>
+      <item.icon size={16} strokeWidth={2} />
       <span>{item.label}</span>
     </div>
   )
@@ -216,7 +217,12 @@ function NotificationBell() {
     if (!open && unread > 0) notificationService.readAll().then(() => setUnread(0)).catch(() => {})
   }
 
-  const typeIcon = (type) => ({ FOLLOW: '👤', COMMENT: '💬', LIKE: '👍' }[type] || '🔔')
+  const TypeIcon = ({ type }) => {
+    if (type === 'FOLLOW')  return <User size={14} />
+    if (type === 'COMMENT') return <MessageCircle size={14} />
+    if (type === 'LIKE')    return <ThumbsUp size={14} />
+    return <Bell size={14} />
+  }
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -230,7 +236,7 @@ function NotificationBell() {
           fontSize: '.85rem', transition: 'all .15s',
         }}
       >
-        🔔
+        <Bell size={16} />
         {unread > 0 && (
           <span style={{
             position: 'absolute', top: -4, right: -4,
@@ -267,7 +273,7 @@ function NotificationBell() {
               padding: '.75rem 1rem', borderBottom: '1px solid var(--border)',
               background: n.read ? 'transparent' : 'var(--green-glo)',
             }}>
-              <span style={{ fontSize: '.9rem', flexShrink: 0, marginTop: 1 }}>{typeIcon(n.type)}</span>
+              <div style={{ flexShrink: 0, marginTop: 2, color: 'var(--text3)' }}><TypeIcon type={n.type} /></div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '.78rem', color: 'var(--text)', lineHeight: 1.4 }}>{n.message}</div>
                 <div style={{ fontSize: '.65rem', color: 'var(--text3)', marginTop: 2 }}>

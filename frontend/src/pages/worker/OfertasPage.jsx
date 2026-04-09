@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Briefcase } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { BtnGreen, EmptyState } from '../../components/ui'
 import { ofertaService } from '../../services'
@@ -38,7 +39,7 @@ export default function OfertasPage() {
       {loading ? (
         <div style={{ color:'var(--text2)', padding:'2rem' }}>Cargando...</div>
       ) : ofertas.length === 0 ? (
-        <EmptyState icon="💼" message="No hay ofertas disponibles con esos filtros."/>
+        <EmptyState icon={Briefcase} message="No hay ofertas disponibles con esos filtros."/>
       ) : (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {ofertas.map(o => (
@@ -51,7 +52,7 @@ export default function OfertasPage() {
                 {(o.company?.nombreEmpresa||'E').slice(0,2).toUpperCase()}
               </div>
               <div style={{ flex:1 }}>
-                <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.9rem', color:'#fff', marginBottom:'.2rem' }}>{o.cargo}</div>
+                <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.9rem', color:'var(--text)', marginBottom:'.2rem' }}>{o.cargo}</div>
                 <div style={{ fontSize:'.75rem', color:'var(--text2)' }}>{o.company?.nombreEmpresa} · {o.comuna||'Lo Espejo'}</div>
               </div>
               <div style={{ display:'flex', gap:6, flexShrink:0 }}>

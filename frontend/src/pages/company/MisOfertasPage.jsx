@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { ClipboardList } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { BtnGreen, BtnOutline, Badge, EmptyState } from '../../components/ui'
 import { ofertaService } from '../../services'
@@ -43,13 +44,13 @@ export default function MisOfertasPage() {
       {loading ? (
         <div style={{ color:'var(--text2)' }}>Cargando...</div>
       ) : ofertas.length === 0 ? (
-        <EmptyState icon="📋" message="No has publicado ninguna oferta todavía."/>
+        <EmptyState icon={ClipboardList} message="No has publicado ninguna oferta todavía."/>
       ) : (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {ofertas.map(o => (
             <div key={o.id} style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, padding:'1.1rem 1.25rem', display:'flex', alignItems:'center', gap:'1rem' }}>
               <div style={{ flex:1 }}>
-                <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.9rem', color:'#fff', marginBottom:'.2rem' }}>{o.cargo}</div>
+                <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.9rem', color:'var(--text)', marginBottom:'.2rem' }}>{o.cargo}</div>
                 <div style={{ fontSize:'.75rem', color:'var(--text2)' }}>{o.especialidadRequerida} · {o.disponibilidad?.replace(/_/g,' ')} · {o.postulaciones?.length||0} postulantes</div>
               </div>
               <Badge label={o.activa ? 'Activa' : 'Inactiva'} color={o.activa ? 'green' : 'gray'}/>
@@ -65,7 +66,7 @@ export default function MisOfertasPage() {
       {modal && (
         <div onClick={e=>{ if(e.target===e.currentTarget) setModal(false) }} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.6)', backdropFilter:'blur(4px)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:16, padding:'2rem', width:'100%', maxWidth:500, maxHeight:'90vh', overflowY:'auto' }}>
-            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.1rem', color:'#fff', marginBottom:'1.5rem' }}>Publicar nueva oferta</div>
+            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.1rem', color:'var(--text)', marginBottom:'1.5rem' }}>Publicar nueva oferta</div>
             {[['Cargo / Título del puesto','cargo','text'],['Especialidad requerida','especialidadRequerida','text'],['Comuna','comuna','text'],['Salario','salario','text'],['Horario','horario','text']].map(([lbl,key]) => (
               <div key={key} style={{ marginBottom:'.75rem' }}>
                 <label style={{ fontSize:'.75rem', color:'var(--text2)', fontWeight:500 }}>{lbl}</label>

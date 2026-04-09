@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { Wrench, Briefcase } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { Avatar, Badge, Chip, BtnGreen, BtnOutline, ProgressBar, SectionTitle, StatCard, EmptyState } from '../../components/ui'
 import { workerService } from '../../services'
@@ -122,7 +123,7 @@ export default function WorkerProfile() {
                   ))}
                 </tbody>
               </table>
-            ) : <EmptyState icon="🔧" message="Sin habilidades registradas. Edita tu perfil para agregarlas."/>}
+            ) : <EmptyState icon={Wrench} message="Sin habilidades registradas. Edita tu perfil para agregarlas."/>}
           </div>
 
 
@@ -172,7 +173,7 @@ export default function WorkerProfile() {
                   </div>
                 ))}
               </div>
-            ) : <EmptyState icon="💼" message="Aún no has postulado a ninguna oferta."/>}
+            ) : <EmptyState icon={Briefcase} message="Aún no has postulado a ninguna oferta."/>}
           </div>
         </div>
       </div>

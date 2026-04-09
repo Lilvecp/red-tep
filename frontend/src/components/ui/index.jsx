@@ -162,10 +162,12 @@ export function SectionTitle({ children, action }) {
 }
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
-export function EmptyState({ icon='📭', message='Sin datos disponibles' }) {
+export function EmptyState({ icon: Icon, message='Sin datos disponibles' }) {
   return (
     <div style={{ textAlign:'center', padding:'3rem 1rem', color:'var(--text3)' }}>
-      <div style={{ fontSize:'2.5rem', marginBottom:'1rem' }}>{icon}</div>
+      <div style={{ display:'flex', justifyContent:'center', marginBottom:'1rem', opacity:0.5 }}>
+        <Icon size={40} strokeWidth={1.5} />
+      </div>
       <div style={{ fontSize:'.9rem' }}>{message}</div>
     </div>
   )

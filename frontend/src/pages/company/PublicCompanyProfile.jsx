@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { Building2, Megaphone, Briefcase } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { Badge, EmptyState } from '../../components/ui'
 import { companyService, postService, followService } from '../../services'
@@ -71,7 +72,7 @@ export default function PublicCompanyProfile() {
   if (!company) {
     return (
       <AppLayout title="Perfil de empresa">
-        <EmptyState icon="🏢" message="Empresa no encontrada" />
+        <EmptyState icon={Building2} message="Empresa no encontrada" />
       </AppLayout>
     )
   }
@@ -212,7 +213,7 @@ export default function PublicCompanyProfile() {
         {tab === 'publicaciones' && (
           <div>
             {posts.length === 0 ? (
-              <EmptyState icon="📢" message="Esta empresa aún no ha publicado nada" />
+              <EmptyState icon={Megaphone} message="Esta empresa aún no ha publicado nada" />
             ) : (
               posts.map(post => (
                 <PostCard
@@ -230,7 +231,7 @@ export default function PublicCompanyProfile() {
         {tab === 'ofertas' && (
           <div>
             {!company.ofertas?.length ? (
-              <EmptyState icon="💼" message="Sin ofertas activas publicadas" />
+              <EmptyState icon={Briefcase} message="Sin ofertas activas publicadas" />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {company.ofertas.map(o => (

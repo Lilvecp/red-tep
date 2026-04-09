@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { toast } from 'react-hot-toast'
+import { Film } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { BtnGreen, EmptyState } from '../../components/ui'
 import { mediaService, workerService } from '../../services'
@@ -43,7 +44,7 @@ export default function PracticasPage() {
       </div>
 
       {feed.length === 0 ? (
-        <EmptyState icon="🎬" message="Aún no has subido videos ni fotos de tus prácticas."/>
+        <EmptyState icon={Film} message="Aún no has subido videos ni fotos de tus prácticas."/>
       ) : (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:10 }}>
           {feed.map(m => (

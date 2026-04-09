@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { MapPin, ThumbsUp, MessageCircle, X, Calendar } from 'lucide-react'
 import AppLayout from '../components/layout/AppLayout'
 import { BtnGreen, BtnOutline, Avatar, Badge, EmptyState } from '../components/ui/index'
 import { eventoService } from '../services/index'
@@ -92,7 +93,7 @@ function EventCard({ evento, isAdmin, onRemoved }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: "'Sora',sans-serif", fontWeight: 600, fontSize: '.9rem', color: 'var(--text)' }}>{evento.titulo}</div>
             {evento.lugar && (
-              <div style={{ fontSize: '.72rem', color: 'var(--text2)', marginTop: 2 }}>📍 {evento.lugar}</div>
+              <div style={{ fontSize: '.72rem', color: 'var(--text2)', marginTop: 2, display:'flex', alignItems:'center', gap:3 }}><MapPin size={11} /> {evento.lugar}</div>
             )}
             <div style={{ fontSize: '.68rem', color: 'var(--text3)', marginTop: 2 }}>
               {d.toLocaleString('es-CL', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}
@@ -127,7 +128,7 @@ function EventCard({ evento, isAdmin, onRemoved }) {
             fontSize: '.78rem', fontWeight: 500, transition: 'all .2s',
           }}
         >
-          👍 {reaction.count > 0 && <span>{reaction.count}</span>}
+          <ThumbsUp size={13}/> {reaction.count > 0 && <span>{reaction.count}</span>}
         </button>
 
         <button
@@ -139,7 +140,7 @@ function EventCard({ evento, isAdmin, onRemoved }) {
             cursor: 'pointer', fontSize: '.78rem', fontWeight: 500,
           }}
         >
-          💬 {evento.commentCount > 0 ? evento.commentCount : ''} {expanded ? 'Cerrar' : 'Comentar'}
+          <MessageCircle size={13}/> {evento.commentCount > 0 ? evento.commentCount : ''} {expanded ? 'Cerrar' : 'Comentar'}
         </button>
       </div>
 
@@ -194,7 +195,7 @@ function EventCard({ evento, isAdmin, onRemoved }) {
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                         <span style={{ fontSize: '.65rem', color: 'var(--text3)' }}>{formatDate(c.createdAt)}</span>
                         {(user?.id === c.authorId || isAdmin) && (
-                          <button onClick={() => handleDeleteComment(c.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', fontSize: '.75rem', padding: '0 2px' }}>✕</button>
+                          <button onClick={() => handleDeleteComment(c.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display:'flex', alignItems:'center', padding: '0 2px' }}><X size={12} /></button>
                         )}
                       </div>
                     </div>
@@ -266,7 +267,7 @@ export default function EventosPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text3)', fontSize: '.85rem' }}>Cargando eventos...</div>
         ) : eventos.length === 0 ? (
-          <EmptyState icon="📅" message="No hay eventos programados" />
+          <EmptyState icon={Calendar} message="No hay eventos programados" />
         ) : (
           eventos.map(e => (
             <EventCard
@@ -286,7 +287,7 @@ export default function EventosPage() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(4px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
         >
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 16, padding: '2rem', width: '100%', maxWidth: 460 }}>
-            <div style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: '1.1rem', color: '#fff', marginBottom: '1.5rem' }}>Crear nuevo evento</div>
+            <div style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', marginBottom: '1.5rem' }}>Crear nuevo evento</div>
             {[['Título del evento', 'titulo'], ['Lugar', 'lugar']].map(([l, k]) => (
               <div key={k} style={{ marginBottom: '.75rem' }}>
                 <label style={lbl}>{l}</label>

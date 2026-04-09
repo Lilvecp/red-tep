@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { Calendar } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { BtnGreen, BtnOutline, EmptyState } from '../../components/ui'
 import { eventoService } from '../../services'
@@ -42,7 +43,7 @@ export default function EventosPage() {
       actions={<BtnGreen onClick={() => setModal(true)}>+ Crear evento</BtnGreen>}
     >
       {eventos.length === 0 ? (
-        <EmptyState icon="📅" message="No hay eventos programados."/>
+        <EmptyState icon={Calendar} message="No hay eventos programados."/>
       ) : (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:'1rem' }}>
           {eventos.map(e => {
@@ -55,7 +56,7 @@ export default function EventosPage() {
                     <div style={{ fontSize:'.6rem', color:'rgba(255,255,255,.65)' }}>{d.toLocaleString('es',{month:'short'}).toUpperCase()}</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.88rem', color:'#fff' }}>{e.titulo}</div>
+                    <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.88rem', color:'var(--text)' }}>{e.titulo}</div>
                     <div style={{ fontSize:'.72rem', color:'var(--text2)' }}>{e.lugar}</div>
                   </div>
                 </div>
@@ -73,7 +74,7 @@ export default function EventosPage() {
       {modal && (
         <div onClick={e=>{ if(e.target===e.currentTarget) setModal(false) }} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.6)', backdropFilter:'blur(4px)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' }}>
           <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:16, padding:'2rem', width:'100%', maxWidth:460 }}>
-            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.1rem', color:'#fff', marginBottom:'1.5rem' }}>Crear nuevo evento</div>
+            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'1.1rem', color:'var(--text)', marginBottom:'1.5rem' }}>Crear nuevo evento</div>
             {[['Título del evento','titulo','text'],['Lugar','lugar','text']].map(([l,k,t])=>(
               <div key={k} style={{ marginBottom:'.75rem' }}>
                 <label style={lbl}>{l}</label>

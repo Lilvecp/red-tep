@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { AlertCircle } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { BtnGreen, BtnOutline, Badge, EmptyState } from '../../components/ui'
 import { ofertaService } from '../../services'
@@ -30,7 +31,7 @@ export default function OfertaDetalle() {
   }
 
   if (loading) return <AppLayout title="Oferta"><div style={{ color:'var(--text2)', padding:'2rem' }}>Cargando...</div></AppLayout>
-  if (!oferta) return <AppLayout title="Oferta"><EmptyState icon="❌" message="Oferta no encontrada"/></AppLayout>
+  if (!oferta) return <AppLayout title="Oferta"><EmptyState icon={AlertCircle} message="Oferta no encontrada"/></AppLayout>
 
   return (
     <AppLayout title="Oportunidad Laboral"
@@ -63,7 +64,7 @@ export default function OfertaDetalle() {
               </div>
             </div>
 
-            <h1 style={{ fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:'1.6rem', color:'#fff', marginBottom:'.6rem' }}>{oferta.cargo}</h1>
+            <h1 style={{ fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:'1.6rem', color:'var(--text)', marginBottom:'.6rem' }}>{oferta.cargo}</h1>
 
             <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:'1.25rem' }}>
               {oferta.salario && <span style={{ background:'var(--amber-bg)', border:'1px solid rgba(212,160,23,.3)', color:'var(--amber-lit)', fontSize:'.72rem', padding:'4px 10px', borderRadius:8 }}>{oferta.salario}</span>}

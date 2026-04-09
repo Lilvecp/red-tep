@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { ThumbsUp, MessageCircle, Pen, X, Trash2 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import { postService, followService, workerService } from '../../services/index'
 import { Avatar, Badge, BtnGreen, BtnOutline } from '../ui/index'
@@ -193,10 +194,10 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
                 onClick={() => { setEditing(!editing); setDraft(hasText ? post.content : '') }}
                 style={btnStyle}
               >
-                {editing ? '✕' : '✏️'}
+                {editing ? <X size={14}/> : <Pen size={14}/>}
               </button>
             )}
-            <button onClick={handleDelete} style={{ ...btnStyle, color: 'var(--red)' }}>🗑</button>
+            <button onClick={handleDelete} style={{ ...btnStyle, color: 'var(--red)' }}><Trash2 size={14}/></button>
           </div>
         )}
       </div>
@@ -257,7 +258,7 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
             fontSize: '.78rem', fontWeight: 500, transition: 'all .2s',
           }}
         >
-          👍 {reaction.count > 0 && <span>{reaction.count}</span>}
+          <ThumbsUp size={13}/> {reaction.count > 0 && <span>{reaction.count}</span>}
         </button>
 
         <button
@@ -269,7 +270,7 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
             cursor: 'pointer', fontSize: '.78rem', fontWeight: 500,
           }}
         >
-          💬 {expanded ? 'Cerrar' : 'Comentar'}
+          <MessageCircle size={13}/> {expanded ? 'Cerrar' : 'Comentar'}
         </button>
       </div>
 
@@ -330,9 +331,9 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
                         {(user?.id === c.authorId || isAdmin) && (
                           <button
                             onClick={() => handleDeleteComment(c.id)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', fontSize: '.75rem', padding: '0 2px' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display:'flex', alignItems:'center', padding: '0 2px' }}
                           >
-                            ✕
+                            <X size={12} />
                           </button>
                         )}
                       </div>

@@ -3,44 +3,44 @@
 @tailwind utilities;
 
 /* ─── Paleta Institucional — C.E. Cardenal José María Caro · Lo Espejo ──────
-   Azul marino institucional  +  Magenta municipalidad Lo Espejo
+   Azul oscuro #2A3353  +  Fondo off-white #F1F5F9
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Fondos — escala azul marino oscuro */
-  --bg:        #07101e;
-  --bg2:       #0b1729;
-  --bg3:       #0f1f38;
-  --surface:   #13263f;
-  --surface2:  #192d4c;
+  /* Fondos — tema claro */
+  --bg:        #F1F5F9;
+  --bg2:       #E8EDF4;
+  --bg3:       #DBE3EF;
+  --surface:   #FFFFFF;
+  --surface2:  #F0F4FA;
 
   /* Bordes */
-  --border:    rgba(255,255,255,0.06);
-  --border2:   rgba(255,255,255,0.13);
+  --border:    rgba(42,51,83,0.10);
+  --border2:   rgba(42,51,83,0.18);
 
-  /* Azul institucional (primario) — reemplaza verde */
-  --green:     #1a4f8c;
-  --green-mid: #2665b5;
-  --green-lit: #4da0e8;
-  --green-glo: rgba(77,160,232,0.14);
+  /* Azul oscuro institucional (primario) */
+  --green:     #2A3353;
+  --green-mid: #3D4E7A;
+  --green-lit: #5B72AB;
+  --green-glo: rgba(42,51,83,0.08);
 
-  /* Magenta Lo Espejo (acento) — usado en branding y detalles especiales */
+  /* Magenta Lo Espejo (acento) */
   --accent:    #be185d;
   --accent-lit:#ec4899;
-  --accent-bg: rgba(190,24,93,0.11);
+  --accent-bg: rgba(190,24,93,0.07);
 
   /* Dorado — logros, validaciones, admin */
   --amber:     #c9940c;
-  --amber-lit: #f0bc38;
-  --amber-bg:  rgba(201,148,12,0.13);
+  --amber-lit: #b5820a;
+  --amber-bg:  rgba(201,148,12,0.10);
 
   /* Error */
-  --red:       #e05252;
-  --red-bg:    rgba(224,82,82,0.12);
+  --red:       #dc2626;
+  --red-bg:    rgba(220,38,38,0.08);
 
-  /* Texto */
-  --text:      #ddeaf8;
-  --text2:     #6a9ec5;
-  --text3:     #3a5f7a;
+  /* Texto — oscuro para fondo claro */
+  --text:      #1A2035;
+  --text2:     #4A5578;
+  --text3:     #8A96B5;
 }
 
 /* ─── Reset & base ──────────────────────────────────────────────────────────── */
@@ -52,6 +52,7 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
@@ -80,8 +81,8 @@ body {
 /* ─── Patrón de fondo sutil (grilla institucional) ──────────────────────────── */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(77,160,232,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(77,160,232,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(42,51,83,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,51,83,0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -90,9 +91,9 @@ body {
   background: linear-gradient(135deg, var(--green-mid), var(--accent-lit));
 }
 
-/* ─── Glow azul institucional ────────────────────────────────────────────────── */
+/* ─── Sombra institucional ───────────────────────────────────────────────────── */
 .glow-blue {
-  box-shadow: 0 0 24px rgba(77,160,232,0.18), 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 0 24px rgba(42,51,83,0.14), 0 4px 16px rgba(0,0,0,0.08);
 }
 
 /* ─── Feed 2 columnas (centro + derecha) ────────────────────────────────────── */

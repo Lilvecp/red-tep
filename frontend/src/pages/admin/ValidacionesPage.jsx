@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { Users } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { Avatar, Badge, BtnGreen, BtnOutline, EmptyState } from '../../components/ui'
 import { adminService } from '../../services'
@@ -50,7 +51,7 @@ export default function ValidacionesPage() {
           {loading ? (
             <div style={{ color:'var(--text2)' }}>Cargando...</div>
           ) : workers.length === 0 ? (
-            <EmptyState icon="👥" message="No hay trabajadores registrados."/>
+            <EmptyState icon={Users} message="No hay trabajadores registrados."/>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
               {workers.map(w => (
@@ -62,7 +63,7 @@ export default function ValidacionesPage() {
                 >
                   <Avatar nombre={w.user?.nombre} size={38}/>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontWeight:600, fontSize:'.85rem', color:'#fff' }}>{w.user?.nombre}</div>
+                    <div style={{ fontWeight:600, fontSize:'.85rem', color:'var(--text)' }}>{w.user?.nombre}</div>
                     <div style={{ fontSize:'.72rem', color:'var(--text2)' }}>{w.especialidad} · {w.curso}</div>
                   </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:3, alignItems:'flex-end' }}>
@@ -79,7 +80,7 @@ export default function ValidacionesPage() {
         <div>
           {selected ? (
             <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, padding:'1.25rem', position:'sticky', top:'1rem' }}>
-              <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.88rem', color:'#fff', marginBottom:'1rem' }}>
+              <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.88rem', color:'var(--text)', marginBottom:'1rem' }}>
                 Validar a {selected.user?.nombre}
               </div>
 
