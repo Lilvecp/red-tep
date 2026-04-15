@@ -8,6 +8,22 @@ import useAuthStore from '../../store/authStore'
 
 const C = { background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, padding:'1.25rem' }
 
+const FeedbackBanner = ({ text, onDelete }) => (
+  <div style={{ display:'flex', alignItems:'flex-start', gap:10, background:'rgba(77,160,232,.07)', border:'1px solid rgba(77,160,232,.2)', borderRadius:9, padding:'.7rem .9rem', marginTop:'.65rem' }}>
+    <div style={{ flex:1, fontSize:'.78rem', color:'var(--text2)', lineHeight:1.5 }}>
+      <span style={{ fontWeight:600, color:'var(--text)', display:'block', fontSize:'.7rem', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:2 }}>Comentario del administrador</span>
+      {text}
+    </div>
+    <button
+      onClick={onDelete}
+      title="Borrar retroalimentación"
+      style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text3)', padding:2, display:'flex', alignItems:'center', flexShrink:0 }}
+    >
+      <X size={14} />
+    </button>
+  </div>
+)
+
 export default function WorkerProfile() {
   const { user } = useAuthStore()
   const [worker, setWorker] = useState(null)
@@ -40,22 +56,6 @@ export default function WorkerProfile() {
       toast.success('Retroalimentación eliminada')
     } catch { toast.error('Error al eliminar') }
   }
-
-  const FeedbackBanner = ({ text, onDelete }) => (
-    <div style={{ display:'flex', alignItems:'flex-start', gap:10, background:'rgba(77,160,232,.07)', border:'1px solid rgba(77,160,232,.2)', borderRadius:9, padding:'.7rem .9rem', marginTop:'.65rem' }}>
-      <div style={{ flex:1, fontSize:'.78rem', color:'var(--text2)', lineHeight:1.5 }}>
-        <span style={{ fontWeight:600, color:'var(--text)', display:'block', fontSize:'.7rem', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:2 }}>Comentario del administrador</span>
-        {text}
-      </div>
-      <button
-        onClick={onDelete}
-        title="Borrar retroalimentación"
-        style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text3)', padding:2, display:'flex', alignItems:'center', flexShrink:0 }}
-      >
-        <X size={14} />
-      </button>
-    </div>
-  )
 
   const handleSave = async () => {
     try {

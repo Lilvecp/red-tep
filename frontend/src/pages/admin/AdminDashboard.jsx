@@ -651,38 +651,6 @@ export default function AdminDashboard() {
 
   useEffect(() => { load() }, [])
 
-  // ── Liceo handlers ──
-  const handleApproveLiceo = async (workerId) => {
-    try {
-      await adminService.approveLiceo(workerId)
-      toast.success('Estudiante validado como alumno del liceo')
-      setLiceoReqs(prev => prev.filter(w => w.id !== workerId))
-    } catch { toast.error('Error al aprobar solicitud') }
-  }
-  const handleRejectLiceo = async (workerId) => {
-    try {
-      await adminService.rejectLiceo(workerId)
-      toast.success('Solicitud rechazada')
-      setLiceoReqs(prev => prev.filter(w => w.id !== workerId))
-    } catch { toast.error('Error al rechazar solicitud') }
-  }
-
-  // ── Badge handlers ──
-  const handleApproveBadge = async (id) => {
-    try {
-      await adminService.approveBadge(id)
-      toast.success('Insignia aprobada')
-      setBadgeReqs(prev => prev.filter(b => b.id !== id))
-    } catch { toast.error('Error al aprobar insignia') }
-  }
-  const handleRejectBadge = async (id) => {
-    try {
-      await adminService.rejectBadge(id)
-      toast.success('Insignia rechazada')
-      setBadgeReqs(prev => prev.filter(b => b.id !== id))
-    } catch { toast.error('Error al rechazar insignia') }
-  }
-
   // ── Company verification ──
   const handleVerify = async (id) => {
     try {

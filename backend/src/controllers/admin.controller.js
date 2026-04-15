@@ -167,7 +167,8 @@ const rejectLiceo = async (req, res) => {
     const { feedback } = req.body
     const worker = await prisma.worker.update({
       where: { id: workerId },
-      data: { liceoValidado: 'RECHAZADO', ...(feedback ? { liceoFeedback: feedback } : {}) },
+      data:  { liceoValidado: 'RECHAZADO', ...(feedback ? { liceoFeedback: feedback } : {}) },
+      include: { user: { select: { nombre: true } } },
     })
     await prisma.adminNotification.updateMany({
       where: { workerId, tipo: 'LICEO_VALIDATION', leida: false },
