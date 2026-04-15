@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { Wrench, Briefcase } from 'lucide-react'
+import { Wrench, Briefcase, X } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
 import { Avatar, Badge, Chip, BtnGreen, BtnOutline, ProgressBar, SectionTitle, StatCard, EmptyState } from '../../components/ui'
 import { workerService } from '../../services'
@@ -21,6 +21,41 @@ export default function WorkerProfile() {
       .catch(() => toast.error('Error al cargar perfil'))
       .finally(() => setLoading(false))
   }, [])
+
+  const handleDeleteLiceoFeedback = async () => {
+    try {
+      await workerService.deleteLiceoFeedback()
+      setWorker(w => ({ ...w, liceoFeedback: null }))
+      toast.success('Retroalimentación eliminada')
+    } catch { toast.error('Error al eliminar') }
+  }
+
+  const handleDeleteBadgeFeedback = async (insigniaId) => {
+    try {
+      await workerService.deleteBadgeFeedback(insigniaId)
+      setWorker(w => ({
+        ...w,
+        insignias: w.insignias.map(i => i.id === insigniaId ? { ...i, adminFeedback: null } : i)
+      }))
+      toast.success('Retroalimentación eliminada')
+    } catch { toast.error('Error al eliminar') }
+  }
+
+  const FeedbackBanner = ({ text, onDelete }) => (
+    <div style={{ display:'flex', alignItems:'flex-start', gap:10, background:'rgba(77,160,232,.07)', border:'1px solid rgba(77,160,232,.2)', borderRadius:9, padding:'.7rem .9rem', marginTop:'.65rem' }}>
+      <div style={{ flex:1, fontSize:'.78rem', color:'var(--text2)', lineHeight:1.5 }}>
+        <span style={{ fontWeight:600, color:'var(--text)', display:'block', fontSize:'.7rem', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:2 }}>Comentario del administrador</span>
+        {text}
+      </div>
+      <button
+        onClick={onDelete}
+        title="Borrar retroalimentación"
+        style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text3)', padding:2, display:'flex', alignItems:'center', flexShrink:0 }}
+      >
+        <X size={14} />
+      </button>
+    </div>
+  )
 
   const handleSave = async () => {
     try {
@@ -44,7 +79,7 @@ export default function WorkerProfile() {
           : <BtnGreen onClick={()=>setEditing(true)}>Editar perfil</BtnGreen>
       }
     >
-      <div style={{ display:'grid', gridTemplateColumns:'290px 1fr', gap:'1.25rem' }}>
+      <div className="p-grid">
         {/* Columna izquierda */}
         <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
           {/* Tarjeta principal */}
@@ -59,11 +94,17 @@ export default function WorkerProfile() {
               </div>
             </div>
             <div style={{ padding:'1.1rem' }}>
-              {[['📍','Lo Espejo, Santiago'],['📧', user?.email],['📞', worker?.telefono||'No registrado'],['🕐', worker?.disponibilidad?.replace(/_/g,' ')||'Por definir']].map(([icon,val]) => (
+              {[['📍','Lo Espejo, Santiago'],['📧', user?.email],['📞', worker?.telefono||'No registrado'],['🕐', worker?.disponibilidad||'Por definir']].map(([icon,val]) => (
                 <div key={icon} style={{ display:'flex', alignItems:'center', gap:7, fontSize:'.78rem', color:'var(--text2)', marginBottom:'.5rem' }}>
                   <span style={{ fontSize:'.82rem' }}>{icon}</span>{val}
                 </div>
               ))}
+              {worker?.liceoFeedback && (
+                <FeedbackBanner
+                  text={worker.liceoFeedback}
+                  onDelete={handleDeleteLiceoFeedback}
+                />
+              )}
             </div>
           </div>
 
@@ -81,17 +122,26 @@ export default function WorkerProfile() {
             <SectionTitle>Insignias</SectionTitle>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:6 }}>
               {[
-                { tipo:'PERFIL_COMPLETO',      icon:'🏅', label:'Perfil' },
-                { tipo:'VALIDADO_POR_PROFESOR',icon:'✅', label:'Validado' },
-                { tipo:'EXPERIENCIA_PRACTICA', icon:'🎬', label:'Práctica' },
-                { tipo:'PRIMERA_POSTULACION',  icon:'💼', label:'1ª Post.' },
-                { tipo:'TOP_CANDIDATO',        icon:'⭐', label:'Top' },
+                { tipo:'PERFIL_COMPLETO',       icon:'🏅', label:'Perfil' },
+                { tipo:'VALIDADO_POR_PROFESOR', icon:'✅', label:'Validado' },
+                { tipo:'EXPERIENCIA_PRACTICA',  icon:'🎬', label:'Práctica' },
+                { tipo:'PRIMERA_POSTULACION',   icon:'💼', label:'1ª Post.' },
+                { tipo:'TOP_CANDIDATO',         icon:'⭐', label:'Top' },
               ].map(({ tipo, icon, label }) => {
-                const earned = worker?.insignias?.some(i => i.tipo === tipo)
+                const insigniaRecord = worker?.insignias?.find(i => i.tipo === tipo)
+                const earned = !!insigniaRecord
                 return (
-                  <div key={tipo} style={{ background: earned ? 'var(--amber-bg)' : 'var(--surface2)', border:`1px solid ${earned ? 'rgba(212,160,23,.3)' : 'var(--border)'}`, borderRadius:8, padding:'.55rem', textAlign:'center' }}>
-                    <div style={{ fontSize:'1.1rem' }}>{earned ? icon : '🔒'}</div>
-                    <div style={{ fontSize:'.6rem', color: earned ? 'var(--amber-lit)' : 'var(--text3)', marginTop:2 }}>{label}</div>
+                  <div key={tipo}>
+                    <div style={{ background: earned ? 'var(--amber-bg)' : 'var(--surface2)', border:`1px solid ${earned ? 'rgba(212,160,23,.3)' : 'var(--border)'}`, borderRadius:8, padding:'.55rem', textAlign:'center' }}>
+                      <div style={{ fontSize:'1.1rem' }}>{earned ? icon : '🔒'}</div>
+                      <div style={{ fontSize:'.6rem', color: earned ? 'var(--amber-lit)' : 'var(--text3)', marginTop:2 }}>{label}</div>
+                    </div>
+                    {insigniaRecord?.adminFeedback && (
+                      <FeedbackBanner
+                        text={insigniaRecord.adminFeedback}
+                        onDelete={() => handleDeleteBadgeFeedback(insigniaRecord.id)}
+                      />
+                    )}
                   </div>
                 )
               })}
