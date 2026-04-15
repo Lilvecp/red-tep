@@ -38,9 +38,9 @@ const getById = async (req, res) => {
 const create = async (req, res) => {
   try {
     const company = await prisma.company.findUnique({ where: { userId: req.user.id } })
-    if (!company?.aprobada)
-      return res.status(403).json({ error: 'Empresa no aprobada para publicar ofertas' })
-    const oferta = await prisma.oferta.create({ data: { ...req.body, companyId: company.id } })
+    if (!company)
+      return res.status(404).json({ error: 'Empresa no encontrada' })
+    const oferta = await prisma.oferta.create({ data: { ...req.body, companyId: company.id, requisitos: req.body.requisitos || [] } })
     res.status(201).json(oferta)
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
