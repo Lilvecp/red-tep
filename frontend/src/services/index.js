@@ -40,6 +40,10 @@ export const workerService = {
   getByUserId:   (userId)  => api.get(`/workers/user/${userId}`),
   search:        (filters) => api.get('/workers/search', { params: filters }),
   uploadMedia:   (fd)      => api.post('/media/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  requestLiceo:  ()        => api.post('/workers/me/request-liceo'),
+  uploadCv:      (cvUrl)   => api.post('/workers/me/upload-cv', { cvUrl }),
+  deleteLiceoFeedback: ()   => api.delete('/workers/me/liceo-feedback'),
+  deleteBadgeFeedback: (id) => api.delete(`/workers/me/badges/${id}/feedback`),
 }
 
 export const companyService = {
@@ -49,6 +53,7 @@ export const companyService = {
   search:              (q)      => api.get('/companies/search', { params: { q } }),
   getPublic:           (userId) => api.get(`/companies/user/${userId}`),
   requestVerification: ()       => api.post('/companies/me/request-verification'),
+  deleteFeedback: () => api.delete('/companies/me/feedback'),
 }
 
 export const ofertaService = {
@@ -64,11 +69,24 @@ export const adminService = {
   getWorkers:      ()           => api.get('/admin/workers'),
   getPending:      ()           => api.get('/admin/companies/pending'),
   getAllCompanies:  ()           => api.get('/admin/companies'),
-  approveCompany:  (id)         => api.put(`/admin/companies/${id}/approve`),
+  approveCompany:  (id, feedback)        => api.put(`/admin/companies/${id}/approve`, { feedback }),
   verifyCompany:   (id)         => api.put(`/admin/companies/${id}/verify`),
   createValidacion:(data)       => api.post('/admin/validaciones', data),
   getAllUsers:      ()           => api.get('/admin/users'),
   assignRole:      (id, role)   => api.put(`/admin/users/${id}/role`, { role }),
+  // Liceo validation
+  getLiceoRequests:()           => api.get('/admin/liceo-requests'),
+  approveLiceo:    (workerId, feedback)  => api.put(`/admin/liceo-requests/${workerId}/approve`, { feedback }),
+  rejectLiceo:     (workerId, feedback)  => api.put(`/admin/liceo-requests/${workerId}/reject`, { feedback }),
+  // Badge requests
+  getBadgeRequests:()           => api.get('/admin/badge-requests'),
+  approveBadge:    (id, feedback)        => api.put(`/admin/badge-requests/${id}/approve`, { feedback }),
+  rejectBadge:     (id, feedback)        => api.put(`/admin/badge-requests/${id}/reject`, { feedback }),
+  // Admin notifications
+  getAdminNotifications:()      => api.get('/admin/notifications'),
+  readAllAdminNotifications:()  => api.put('/admin/notifications/read-all'),
+  // Bulk import
+  bulkImport:      (fd)         => api.post('/admin/bulk-import', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
 }
 
 export const mediaService = {
@@ -116,4 +134,15 @@ export const filterService = {
   getAll:  (tipo) => api.get('/filters', { params: { tipo } }),
   create:  (data) => api.post('/filters', data),
   remove:  (id)   => api.delete(`/filters/${id}`),
+}
+
+// Progreso Formativo — worker reads + updates own progress
+export const progresoService = {
+  getAll:   ()              => api.get('/progreso'),
+  updateMe: (id, porcentaje) => api.put(`/progreso/me/${id}`, { porcentaje }),
+  // Admin CRUD
+  adminGetAll: ()           => api.get('/admin/progreso'),
+  adminCreate: (data)       => api.post('/admin/progreso', data),
+  adminUpdate: (id, data)   => api.put(`/admin/progreso/${id}`, data),
+  adminDelete: (id)         => api.delete(`/admin/progreso/${id}`),
 }
