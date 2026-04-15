@@ -13,19 +13,14 @@ datasource db {
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum Role {
-  STUDENT_TP    // Estudiante técnico diurno
-  STUDENT_EPJA  // Estudiante técnico vespertino
+  STUDENT       // Estudiante (nuevo — rol unificado)
+  STUDENT_TP    // Estudiante técnico diurno (legacy)
+  STUDENT_EPJA  // Estudiante técnico vespertino (legacy)
   TEACHER       // Docente validador
   COMPANY       // Empresa reclutadora
   ADMIN         // Administración del colegio
 }
 
-enum Disponibilidad {
-  TIEMPO_COMPLETO
-  MEDIO_TIEMPO
-  FINES_DE_SEMANA
-  POR_DEFINIR
-}
 
 enum NivelCompetencia {
   BAJO
@@ -33,13 +28,7 @@ enum NivelCompetencia {
   ALTO
 }
 
-enum TipoInsignia {
-  PERFIL_COMPLETO
-  VALIDADO_POR_PROFESOR
-  EXPERIENCIA_PRACTICA
-  PRIMERA_POSTULACION
-  TOP_CANDIDATO
-}
+// TipoInsignia removed — tipo is now a free String to support dynamic progress sections
 
 enum TipoMedia {
   VIDEO
@@ -84,7 +73,7 @@ model Worker {
 
   // Perfil profesional
   experienciaPractica      String?
-  disponibilidad           Disponibilidad?
+  disponibilidad           String?
   videoUrl                 String?          // Video de práctica (Cloudinary)
 
   // Evaluación socioemocional (JSON con puntajes 1-5)
@@ -96,6 +85,13 @@ model Worker {
   // Personalización visual
   bannerColor              String?
 
+  // Validación del liceo
+  liceoValidado            String?          // null | PENDIENTE | APROBADO | RECHAZADO
+
+  // CV subido
+  cvUrl                    String?
+  liceoFeedback            String?
+
   // Estado
   perfilCompleto           Boolean          @default(false)
   buscandoTrabajo          Boolean          @default(true)
@@ -106,6 +102,7 @@ model Worker {
   insignias                Insignia[]
   media                    Media[]
   postulaciones            Postulacion[]
+  progresosUsuario         ProgresoUsuario[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -139,13 +136,59 @@ model Validacion {
 }
 
 model Insignia {
-  id         Int          @id @default(autoincrement())
-  workerId   Int
-  worker     Worker       @relation(fields: [workerId], references: [id])
-  tipo       TipoInsignia
-  otorgadaEn DateTime     @default(now())
+  id                  Int                @id @default(autoincrement())
+  workerId            Int
+  worker              Worker             @relation(fields: [workerId], references: [id])
+  tipo                String             // legacy: PERFIL_COMPLETO etc; dynamic: nombre de sección
+  estado              String             @default("APROBADA") // PENDIENTE | APROBADA | RECHAZADA
+  otorgadaEn          DateTime           @default(now())
+  adminFeedback       String?
+  progresoFormativoId Int?               // null = legacy badge; not null = linked to progress section
+  progresoFormativo   ProgresoFormativo? @relation(fields: [progresoFormativoId], references: [id], onDelete: SetNull)
 
   @@map("insignias")
+}
+
+model ProgresoFormativo {
+  id               Int               @id @default(autoincrement())
+  nombre           String
+  descripcion      String?
+  activo           Boolean           @default(true)
+  orden            Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  progresosUsuario ProgresoUsuario[]
+  insignias        Insignia[]
+
+  @@map("progreso_formativo")
+}
+
+model ProgresoUsuario {
+  id                  Int               @id @default(autoincrement())
+  workerId            Int
+  progresoFormativoId Int
+  porcentaje          Int               @default(0)
+  updatedAt           DateTime          @updatedAt
+
+  worker              Worker            @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  progresoFormativo   ProgresoFormativo @relation(fields: [progresoFormativoId], references: [id], onDelete: Cascade)
+
+  @@unique([workerId, progresoFormativoId])
+  @@map("progreso_usuario")
+}
+
+model AdminNotification {
+  id           Int      @id @default(autoincrement())
+  tipo         String   // LICEO_VALIDATION | BADGE_REQUEST
+  mensaje      String
+  workerId     Int
+  workerNombre String   @default("")
+  referenceId  Int?
+  leida        Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@map("admin_notifications")
 }
 
 model Media {
@@ -176,6 +219,7 @@ model Company {
   aprobada                Boolean  @default(false)
   verified                Boolean  @default(false)
   verificationRequested   Boolean  @default(false)
+  adminFeedback           String?
   createdAt               DateTime @default(now())
 
   ofertas      Oferta[]
@@ -191,9 +235,10 @@ model Oferta {
   descripcion           String?
   especialidadRequerida String?
   comuna                String?
-  disponibilidad        Disponibilidad?
+  disponibilidad        String?
   salario               String?
   horario               String?
+  imagenUrl             String?
   requisitos            String[]        // Array de strings
   activa                Boolean         @default(true)
   createdAt             DateTime        @default(now())
