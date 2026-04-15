@@ -8,5 +8,6 @@ r.get('/',                         verifyToken, isAny,     c.listApproved)
 r.get('/me',                       verifyToken, isCompany, c.getMe)
 r.put('/me',                       verifyToken, isCompany, c.updateMe)
 r.post('/me/request-verification', verifyToken, isCompany, c.requestVerification)
+r.delete('/me/feedback',           verifyToken, isCompany, c.deleteFeedback)
 
 module.exports = r

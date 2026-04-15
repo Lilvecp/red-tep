@@ -10,8 +10,12 @@ r.get('/search', verifyToken, (req,res,next) => {
 }, c.search)
 
 // Perfil propio — solo trabajadores
-r.get('/me',  verifyToken, isWorker, c.getMe)
-r.put('/me',  verifyToken, isWorker, c.updateMe)
+r.get('/me',             verifyToken, isWorker, c.getMe)
+r.put('/me',             verifyToken, isWorker, c.updateMe)
+r.post('/me/request-liceo', verifyToken, isWorker, c.requestLiceo)
+r.post('/me/upload-cv',     verifyToken, isWorker, c.uploadCv)
+r.delete('/me/liceo-feedback',      verifyToken, isWorker, c.deleteLiceoFeedback)
+r.delete('/me/badges/:id/feedback', verifyToken, isWorker, c.deleteBadgeFeedback)
 
 // Ver perfil por userId — cualquier autenticado (debe ir ANTES de /:id)
 r.get('/user/:userId', verifyToken, isAny, c.getByUserId)

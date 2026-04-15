@@ -82,4 +82,14 @@ const requestVerification = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
-module.exports = { getMe, updateMe, getPublic, listApproved, requestVerification, search }
+// DELETE /companies/me/feedback
+const deleteFeedback = async (req, res) => {
+  try {
+    const c = await prisma.company.findUnique({ where: { userId: req.user.id } })
+    if (!c) return res.status(404).json({ error: 'Empresa no encontrada' })
+    await prisma.company.update({ where: { id: c.id }, data: { adminFeedback: null } })
+    res.json({ message: 'Retroalimentación eliminada' })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
+module.exports = { getMe, updateMe, getPublic, listApproved, requestVerification, search, deleteFeedback }
