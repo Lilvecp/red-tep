@@ -31,6 +31,7 @@ export const authService = {
   login:    (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
   me:       ()     => api.get('/auth/me'),
+  updateMe: (data) => api.patch('/auth/me', data),
 }
 
 export const workerService = {
@@ -57,11 +58,13 @@ export const companyService = {
 }
 
 export const ofertaService = {
-  getAll:    (filters) => api.get('/ofertas', { params: filters }),
-  getById:   (id)      => api.get(`/ofertas/${id}`),
-  create:    (data)    => api.post('/ofertas', data),
-  update:    (id, d)   => api.put(`/ofertas/${id}`, d),
-  postular:  (id)      => api.post(`/ofertas/${id}/postular`),
+  getAll:           (filters) => api.get('/ofertas', { params: filters }),
+  getById:          (id)      => api.get(`/ofertas/${id}`),
+  create:           (data)    => api.post('/ofertas', data),
+  update:           (id, d)   => api.put(`/ofertas/${id}`, d),
+  remove:           (id)      => api.delete(`/ofertas/${id}`),
+  postular:         (id)      => api.post(`/ofertas/${id}/postular`),
+  getPostulaciones: (id)      => api.get(`/ofertas/${id}/postulaciones`),
 }
 
 export const adminService = {
@@ -69,8 +72,9 @@ export const adminService = {
   getWorkers:      ()           => api.get('/admin/workers'),
   getPending:      ()           => api.get('/admin/companies/pending'),
   getAllCompanies:  ()           => api.get('/admin/companies'),
-  approveCompany:  (id, feedback)        => api.put(`/admin/companies/${id}/approve`, { feedback }),
-  verifyCompany:   (id)         => api.put(`/admin/companies/${id}/verify`),
+  approveCompany:  (id, feedback) => api.put(`/admin/companies/${id}/approve`, { feedback }),
+  rejectCompany:   (id, feedback) => api.put(`/admin/companies/${id}/reject`,  { feedback }),
+  verifyCompany:   (id)           => api.put(`/admin/companies/${id}/verify`),
   createValidacion:(data)       => api.post('/admin/validaciones', data),
   getAllUsers:      ()           => api.get('/admin/users'),
   assignRole:      (id, role)   => api.put(`/admin/users/${id}/role`, { role }),
@@ -87,6 +91,22 @@ export const adminService = {
   readAllAdminNotifications:()  => api.put('/admin/notifications/read-all'),
   // Bulk import
   bulkImport:      (fd)         => api.post('/admin/bulk-import', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+}
+
+export const badgeService = {
+  // Templates
+  getTemplates:  ()           => api.get('/badges/templates'),
+  createTemplate:(data)       => api.post('/badges/templates', data),
+  updateTemplate:(id, data)   => api.put(`/badges/templates/${id}`, data),
+  deleteTemplate:(id)         => api.delete(`/badges/templates/${id}`),
+  // Awards
+  getAllAwards:  ()            => api.get('/badges/awards'),
+  awardBadge:   (data)        => api.post('/badges/award', data),
+  revokeAward:  (id)          => api.delete(`/badges/award/${id}`),
+  // User
+  getMyBadges:  ()            => api.get('/badges/me'),
+  getUserBadges:(userId)      => api.get(`/badges/user/${userId}`),
+  toggleVisibility:(id)       => api.patch(`/badges/award/${id}/visibility`),
 }
 
 export const mediaService = {
@@ -134,6 +154,15 @@ export const filterService = {
   getAll:  (tipo) => api.get('/filters', { params: { tipo } }),
   create:  (data) => api.post('/filters', data),
   remove:  (id)   => api.delete(`/filters/${id}`),
+}
+
+export const chatService = {
+  getConversations:   ()           => api.get('/chat/conversations'),
+  createConversation: (data)       => api.post('/chat/conversations', data),
+  getMessages:        (id, before) => api.get(`/chat/conversations/${id}/messages${before ? `?before=${before}` : ''}`),
+  markRead:           (id)         => api.put(`/chat/conversations/${id}/read`),
+  deleteMessage:      (id)         => api.delete(`/chat/messages/${id}`),
+  uploadImage:        (fd)         => api.post('/chat/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
 }
 
 // Progreso Formativo — worker reads + updates own progress

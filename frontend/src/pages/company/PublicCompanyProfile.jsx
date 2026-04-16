@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { Building2, Megaphone, Briefcase } from 'lucide-react'
 import AppLayout from '../../components/layout/AppLayout'
-import { Badge, EmptyState } from '../../components/ui'
-import { companyService, postService, followService } from '../../services'
+import { Badge, EmptyState, BadgePill } from '../../components/ui'
+import { companyService, postService, followService, badgeService } from '../../services'
 import PostCard from '../../components/feed/PostCard'
 import useAuthStore from '../../store/authStore'
+import { useChat } from '../../hooks/useChat'
 
-const DEFAULT_BANNER = 'linear-gradient(135deg, #1a4f8c 0%, #0b1729 100%)'
+const DEFAULT_BANNER = 'linear-gradient(135deg, #3B6EDC 0%, #1e2d54 100%)'
 
 export default function PublicCompanyProfile() {
   const { userId }  = useParams()
@@ -17,10 +18,12 @@ export default function PublicCompanyProfile() {
 
   const [company,       setCompany]       = useState(null)
   const [posts,         setPosts]         = useState([])
+  const [badges,        setBadges]        = useState([])
   const [loading,       setLoading]       = useState(true)
   const [following,     setFollowing]     = useState(false)
   const [followLoading, setFollowLoading] = useState(false)
   const [tab,           setTab]           = useState('perfil')
+  const { openConversation } = useChat()
 
   const uid = Number(userId)
 
@@ -28,9 +31,15 @@ export default function PublicCompanyProfile() {
     companyService.getPublic(uid)
       .then(r => {
         setCompany(r.data)
-        return postService.getAll({ authorId: uid })
+        return Promise.allSettled([
+          postService.getAll({ authorId: uid }),
+          badgeService.getUserBadges(uid),
+        ])
       })
-      .then(r => setPosts(r.data))
+      .then(([pRes, bRes]) => {
+        if (pRes.status === 'fulfilled') setPosts(pRes.value.data)
+        if (bRes.status === 'fulfilled') setBadges(bRes.value.data)
+      })
       .catch(() => toast.error('Error al cargar el perfil'))
       .finally(() => setLoading(false))
   }, [uid])
@@ -86,8 +95,8 @@ export default function PublicCompanyProfile() {
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
 
         {/* ── Banner + logo ── */}
-        <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: '1.25rem', border: '1px solid var(--border)' }}>
-          <div style={{ height: 140, background: banner, position: 'relative' }} />
+        <div style={{ borderRadius: 16, marginBottom: '1.25rem', border: '1px solid var(--border)' }}>
+          <div style={{ height: 140, background: banner, position: 'relative', borderRadius: '16px 16px 0 0' }} />
 
           <div style={{ background: 'var(--surface)', padding: '0 1.75rem 1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: -44 }}>
@@ -121,6 +130,21 @@ export default function PublicCompanyProfile() {
                     }}
                   >
                     {followLoading ? '...' : following ? 'Siguiendo' : '+ Seguir'}
+                  </button>
+                )}
+                {!isOwnProfile && (
+                  <button
+                    onClick={() => openConversation(uid)}
+                    style={{
+                      padding: '7px 18px', borderRadius: 20,
+                      border: '1px solid var(--border)',
+                      background: 'transparent', color: 'var(--text2)',
+                      fontSize: '.82rem', cursor: 'pointer',
+                      fontFamily: "'Figtree','DM Sans',sans-serif",
+                      display: 'flex', alignItems: 'center', gap: 5,
+                    }}
+                  >
+                    💬 Mensaje
                   </button>
                 )}
                 {company.user?.email && (
@@ -188,6 +212,15 @@ export default function PublicCompanyProfile() {
 
         {/* ── Tab: Perfil ── */}
         {tab === 'perfil' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {badges.length > 0 && (
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
+              <div style={{ fontFamily: "'Sora',sans-serif", fontWeight: 600, fontSize: '.85rem', color: 'var(--text)', marginBottom: '1rem' }}>Insignias</div>
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                {badges.map(award => <BadgePill key={award.id} award={award} />)}
+              </div>
+            </div>
+          )}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
             <div style={{ fontFamily: "'Sora',sans-serif", fontWeight: 600, fontSize: '.85rem', color: 'var(--text)', marginBottom: '1rem' }}>
               Información
@@ -206,6 +239,7 @@ export default function PublicCompanyProfile() {
                 <span>{val}</span>
               </div>
             ))}
+          </div>
           </div>
         )}
 
@@ -250,7 +284,7 @@ export default function PublicCompanyProfile() {
                       {o.cargo}
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {o.disponibilidad && <span style={{ background: 'var(--surface2)', color: 'var(--text2)', fontSize: '.68rem', padding: '3px 8px', borderRadius: 8 }}>{o.disponibilidad.replace(/_/g, ' ')}</span>}
+                      {o.disponibilidad && <span style={{ background: 'var(--surface2)', color: 'var(--text2)', fontSize: '.68rem', padding: '3px 8px', borderRadius: 8 }}>{o.disponibilidad}</span>}
                       {o.salario && <span style={{ background: 'var(--amber-bg)', color: 'var(--amber-lit)', fontSize: '.68rem', padding: '3px 8px', borderRadius: 8 }}>{o.salario}</span>}
                       {o.comuna && <span style={{ background: 'var(--surface2)', color: 'var(--text2)', fontSize: '.68rem', padding: '3px 8px', borderRadius: 8 }}>📍 {o.comuna}</span>}
                     </div>

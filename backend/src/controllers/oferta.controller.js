@@ -30,7 +30,42 @@ const getById = async (req, res) => {
       }
     })
     if (!oferta) return res.status(404).json({ error: 'Oferta no encontrada' })
-    res.json(oferta)
+
+    let yaPostule = false
+    if (req.user) {
+      const worker = await prisma.worker.findUnique({ where: { userId: req.user.id } })
+      if (worker) {
+        const existing = await prisma.postulacion.findFirst({
+          where: { workerId: worker.id, ofertaId: oferta.id }
+        })
+        yaPostule = !!existing
+      }
+    }
+
+    res.json({ ...oferta, yaPostule })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
+// GET /api/ofertas/:id/postulaciones — solo la empresa dueña
+const getPostulaciones = async (req, res) => {
+  try {
+    const company = await prisma.company.findUnique({ where: { userId: req.user.id } })
+    const oferta  = await prisma.oferta.findFirst({ where: { id: Number(req.params.id), companyId: company?.id } })
+    if (!oferta) return res.status(403).json({ error: 'No autorizado' })
+
+    const postulaciones = await prisma.postulacion.findMany({
+      where: { ofertaId: oferta.id },
+      include: {
+        worker: {
+          include: {
+            user: { select: { nombre: true, email: true } },
+            habilidades: { select: { nombre: true } },
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+    res.json(postulaciones)
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
@@ -56,6 +91,17 @@ const update = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
+// DELETE /api/ofertas/:id  — solo la empresa dueña
+const remove = async (req, res) => {
+  try {
+    const company = await prisma.company.findUnique({ where: { userId: req.user.id } })
+    const oferta  = await prisma.oferta.findFirst({ where: { id: Number(req.params.id), companyId: company?.id } })
+    if (!oferta) return res.status(404).json({ error: 'Oferta no encontrada o no autorizado' })
+    await prisma.oferta.delete({ where: { id: oferta.id } })
+    res.json({ ok: true })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
 // POST /api/ofertas/:id/postular  — solo trabajadores
 const postular = async (req, res) => {
   try {
@@ -77,4 +123,4 @@ const postular = async (req, res) => {
   }
 }
 
-module.exports = { list, getById, create, update, postular }
+module.exports = { list, getById, create, update, postular, remove, getPostulaciones }

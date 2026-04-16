@@ -9,7 +9,7 @@ export default function OfertasPage() {
   const nav = useNavigate()
   const [ofertas, setOfertas] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState({ especialidad:'', disponibilidad:'' })
+  const [filters, setFilters] = useState({ especialidad:'' })
 
   const load = () => {
     setLoading(true)
@@ -27,12 +27,7 @@ export default function OfertasPage() {
       <div style={{ display:'flex', gap:10, marginBottom:'1.25rem', flexWrap:'wrap' }}>
         <input placeholder="Especialidad..." value={filters.especialidad} onChange={e=>setFilters({...filters,especialidad:e.target.value})}
           style={{ padding:'8px 12px', background:'var(--surface)', border:'1px solid var(--border2)', borderRadius:8, color:'var(--text)', fontFamily:"'Figtree','DM Sans',sans-serif", fontSize:'.82rem', outline:'none', width:180 }}/>
-        <select value={filters.disponibilidad} onChange={e=>setFilters({...filters,disponibilidad:e.target.value})}
-          style={{ padding:'8px 12px', background:'var(--surface)', border:'1px solid var(--border2)', borderRadius:8, color:'var(--text)', fontFamily:"'Figtree','DM Sans',sans-serif", fontSize:'.82rem', outline:'none' }}>
-          <option value="">Disponibilidad</option>
-          {['TIEMPO_COMPLETO','MEDIO_TIEMPO','FINES_DE_SEMANA'].map(d=><option key={d} value={d}>{d.replace(/_/g,' ')}</option>)}
-        </select>
-        <BtnGreen onClick={load} style={{ padding:'8px 16px' }}>Buscar</BtnGreen>
+<BtnGreen onClick={load} style={{ padding:'8px 16px' }}>Buscar</BtnGreen>
         <span style={{ marginLeft:'auto', fontSize:'.8rem', color:'var(--text2)', alignSelf:'center' }}>{ofertas.length} resultados</span>
       </div>
 
@@ -57,7 +52,7 @@ export default function OfertasPage() {
               </div>
               <div style={{ display:'flex', gap:6, flexShrink:0 }}>
                 {o.salario && <span style={{ background:'var(--amber-bg)', border:'1px solid rgba(212,160,23,.3)', color:'var(--amber-lit)', fontSize:'.68rem', padding:'3px 8px', borderRadius:8 }}>{o.salario}</span>}
-                {o.disponibilidad && <span style={{ background:'var(--surface2)', color:'var(--text2)', fontSize:'.68rem', padding:'3px 8px', borderRadius:8 }}>{o.disponibilidad.replace(/_/g,' ')}</span>}
+                {o.disponibilidad && <span style={{ background:'var(--surface2)', color:'var(--text2)', fontSize:'.68rem', padding:'3px 8px', borderRadius:8 }}>{o.disponibilidad}</span>}
               </div>
               <span style={{ color:'var(--green-lit)', fontSize:'.8rem', flexShrink:0 }}>Ver →</span>
             </div>

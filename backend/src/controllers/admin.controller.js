@@ -1,5 +1,6 @@
 const prisma = require('../utils/prisma')
 const bcrypt = require('bcryptjs')
+const XLSX   = require('xlsx')
 
 // ─── Metrics ──────────────────────────────────────────────────────────────────
 const getMetrics = async (req, res) => {
@@ -50,6 +51,20 @@ const approveCompany = async (req, res) => {
       data:  { aprobada: true, ...(feedback ? { adminFeedback: feedback } : {}) },
     })
     res.json({ message: 'Empresa aprobada', company })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
+const rejectCompany = async (req, res) => {
+  try {
+    const { feedback } = req.body
+    const company = await prisma.company.update({
+      where: { id: Number(req.params.id) },
+      data: {
+        verificationRequested: false,
+        ...(feedback ? { adminFeedback: feedback } : {}),
+      },
+    })
+    res.json({ message: 'Verificación rechazada', company })
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
@@ -263,7 +278,7 @@ const bulkImport = async (req, res) => {
 
     if (origname.endsWith('.csv') || mimetype === 'text/csv' || mimetype === 'text/plain') {
       // Parse CSV manually (UTF-8, comma or semicolon separated)
-      const text  = buf.toString('utf-8')
+      const text  = buf.toString('utf-8').replace(/^\uFEFF/, '')
       const lines = text.split(/\r?\n/).filter(l => l.trim())
       if (lines.length < 2) return res.status(400).json({ error: 'El CSV debe tener al menos una fila de datos' })
       const header = lines[0].split(/[,;]/).map(h => h.trim().toLowerCase().replace(/"/g, ''))
@@ -274,27 +289,23 @@ const bulkImport = async (req, res) => {
         rows.push(obj)
       }
     } else {
-      // Try XLSX
-      try {
-        const XLSX = require('xlsx')
-        const wb   = XLSX.read(buf, { type: 'buffer' })
-        const ws   = wb.Sheets[wb.SheetNames[0]]
-        rows       = XLSX.utils.sheet_to_json(ws, { defval: '' })
-        // Normalize keys to lowercase
-        rows = rows.map(r => {
-          const out = {}
-          Object.keys(r).forEach(k => { out[k.toLowerCase().trim()] = String(r[k] || '').trim() })
-          return out
-        })
-      } catch (xlsxErr) {
-        return res.status(400).json({ error: 'Formato de archivo no soportado. Use CSV o instale el paquete xlsx.' })
-      }
+      // XLSX / XLS
+      const wb = XLSX.read(buf, { type: 'buffer' })
+      const ws = wb.Sheets[wb.SheetNames[0]]
+      rows     = XLSX.utils.sheet_to_json(ws, { defval: '' })
+      // Normalize keys to lowercase
+      rows = rows.map(r => {
+        const out = {}
+        Object.keys(r).forEach(k => { out[k.toLowerCase().trim()] = String(r[k] || '').trim() })
+        return out
+      })
     }
 
     const ROLE_MAP = {
       estudiante:    'STUDENT',
       student:       'STUDENT',
       student_tp:    'STUDENT',
+      tp:            'STUDENT',
       student_epja:  'STUDENT',
       epja:          'STUDENT',
       profesor:      'TEACHER',
@@ -314,7 +325,7 @@ const bulkImport = async (req, res) => {
 
         if (!nombre || !email) { skipped++; continue }
 
-        const role = ROLE_MAP[tipo] || 'STUDENT_TP'
+        const role = ROLE_MAP[tipo] || 'STUDENT'
 
         // Check duplicate
         const exists = await prisma.user.findUnique({ where: { email } })
@@ -352,7 +363,7 @@ const bulkImport = async (req, res) => {
 }
 
 module.exports = {
-  getMetrics, getPending, approveCompany, getAllWorkers, createValidacion,
+  getMetrics, getPending, approveCompany, rejectCompany, getAllWorkers, createValidacion,
   getAllCompanies, verifyCompany, getAllUsers, assignRole,
   getLiceoRequests, approveLiceo, rejectLiceo,
   getBadgeRequests, approveBadge, rejectBadge,

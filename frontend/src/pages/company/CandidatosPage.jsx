@@ -37,7 +37,7 @@ export default function CandidatosPage() {
       title="Explorar Candidatos"
       actions={<span style={{ fontSize: '.82rem', color: 'var(--text2)' }}>{workers.length} candidatos</span>}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 252px', gap: '1.25rem' }}>
+      <div className="r-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 252px', gap: '1.25rem' }}>
 
         {/* ── Lista de candidatos ── */}
         <div>
@@ -63,7 +63,7 @@ export default function CandidatosPage() {
           ) : workers.length === 0 ? (
             <EmptyState icon={Users} message="No hay candidatos con esos filtros." />
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div className="g-2" style={{ gap: 10 }}>
               {workers.map(w => (
                 <div
                   key={w.id}
@@ -94,7 +94,7 @@ export default function CandidatosPage() {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '.68rem', color: 'var(--green-lit)' }}>
-                      {w.disponibilidad?.replace(/_/g, ' ')}
+                      {w.disponibilidad}
                     </span>
                     <button
                       onClick={e => { e.stopPropagation(); navigate('/trabajadores/' + w.id) }}
@@ -205,18 +205,21 @@ export default function CandidatosPage() {
                 >
                   Ver perfil completo
                 </button>
-                <a
-                  href={`mailto:${selected.user?.email}`}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(selected.user?.email || '')
+                    toast.success('Correo copiado: ' + selected.user?.email)
+                  }}
                   style={{
                     flex: 1, padding: '7px', borderRadius: 8,
                     border: '1px solid var(--border)',
                     background: 'transparent', color: 'var(--text2)',
                     fontSize: '.78rem', cursor: 'pointer', textAlign: 'center',
-                    textDecoration: 'none', fontFamily: "'Figtree','DM Sans',sans-serif",
+                    fontFamily: "'Figtree','DM Sans',sans-serif",
                   }}
                 >
                   Contactar
-                </a>
+                </button>
               </div>
             </div>
           )}

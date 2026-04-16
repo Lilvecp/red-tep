@@ -24,6 +24,7 @@ export default function OfertaDetalle() {
     setPosting(true)
     try {
       await ofertaService.postular(id)
+      setOferta(prev => ({ ...prev, yaPostule: true }))
       toast.success('¡Postulación enviada!')
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al postular')
@@ -37,7 +38,7 @@ export default function OfertaDetalle() {
     <AppLayout title="Oportunidad Laboral"
       actions={<BtnOutline onClick={() => nav('/ofertas')}>← Volver</BtnOutline>}
     >
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 280px', gap:'1.25rem' }}>
+      <div className="r-grid" style={{ display:'grid', gridTemplateColumns:'1fr 280px', gap:'1.25rem' }}>
         {/* Main */}
         <div>
           <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:14, padding:'1.75rem' }}>
@@ -60,7 +61,13 @@ export default function OfertaDetalle() {
               </div>
               <div style={{ display:'flex', gap:8 }}>
                 <BtnOutline onClick={() => nav(`/empresas/${oferta.company?.userId}`)}>Ver empresa</BtnOutline>
-                <BtnGreen onClick={handlePostular} disabled={posting}>{posting ? 'Enviando...' : 'Postular Ahora'}</BtnGreen>
+                {oferta.yaPostule ? (
+                  <button disabled style={{ padding:'9px 18px', borderRadius:8, border:'none', background:'var(--surface2)', color:'var(--green-lit)', fontSize:'.85rem', fontWeight:600, cursor:'default', fontFamily:"'Figtree','DM Sans',sans-serif" }}>
+                    ✓ Ya postulado
+                  </button>
+                ) : (
+                  <BtnGreen onClick={handlePostular} disabled={posting}>{posting ? 'Enviando...' : 'Postular Ahora'}</BtnGreen>
+                )}
               </div>
             </div>
 
@@ -68,7 +75,7 @@ export default function OfertaDetalle() {
 
             <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:'1.25rem' }}>
               {oferta.salario && <span style={{ background:'var(--amber-bg)', border:'1px solid rgba(212,160,23,.3)', color:'var(--amber-lit)', fontSize:'.72rem', padding:'4px 10px', borderRadius:8 }}>{oferta.salario}</span>}
-              {oferta.disponibilidad && <span style={{ background:'var(--surface2)', color:'var(--text2)', fontSize:'.72rem', padding:'4px 10px', borderRadius:8 }}>{oferta.disponibilidad.replace(/_/g,' ')}</span>}
+              {oferta.disponibilidad && <span style={{ background:'var(--surface2)', color:'var(--text2)', fontSize:'.72rem', padding:'4px 10px', borderRadius:8 }}>{oferta.disponibilidad}</span>}
               {oferta.horario && <span style={{ background:'var(--surface2)', color:'var(--text2)', fontSize:'.72rem', padding:'4px 10px', borderRadius:8 }}>{oferta.horario}</span>}
               {oferta.especialidadRequerida && <span style={{ background:'var(--green-glo)', border:'1px solid rgba(82,183,136,.25)', color:'var(--green-lit)', fontSize:'.72rem', padding:'4px 10px', borderRadius:8 }}>{oferta.especialidadRequerida}</span>}
             </div>
@@ -100,7 +107,7 @@ export default function OfertaDetalle() {
           <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, padding:'1.25rem' }}>
             <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.82rem', color:'var(--text)', marginBottom:'.75rem' }}>Detalles del cargo</div>
             {[
-              ['Tipo', oferta.disponibilidad?.replace(/_/g,' ')],
+              ['Tipo', oferta.disponibilidad || 'Por definir'],
               ['Horario', oferta.horario || 'Por definir'],
               ['Salario', oferta.salario || 'A convenir'],
               ['Especialidad', oferta.especialidadRequerida || 'Cualquiera'],
@@ -112,9 +119,15 @@ export default function OfertaDetalle() {
               </div>
             ))}
           </div>
-          <BtnGreen onClick={handlePostular} disabled={posting} style={{ width:'100%', padding:12, fontSize:'.88rem' }}>
-            {posting ? 'Enviando postulación...' : 'Postular a esta oferta'}
-          </BtnGreen>
+          {oferta.yaPostule ? (
+            <button disabled style={{ width:'100%', padding:12, fontSize:'.88rem', borderRadius:9, border:'none', background:'var(--surface2)', color:'var(--green-lit)', fontWeight:600, cursor:'default', fontFamily:"'Figtree','DM Sans',sans-serif" }}>
+              ✓ Ya postulado a esta oferta
+            </button>
+          ) : (
+            <BtnGreen onClick={handlePostular} disabled={posting} style={{ width:'100%', padding:12, fontSize:'.88rem' }}>
+              {posting ? 'Enviando postulación...' : 'Postular a esta oferta'}
+            </BtnGreen>
+          )}
         </div>
       </div>
     </AppLayout>

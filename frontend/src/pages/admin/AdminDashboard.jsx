@@ -192,6 +192,26 @@ function BulkImportPanel() {
   const [loading,  setLoading]  = useState(false)
   const [fileName, setFileName] = useState('')
 
+  const downloadTemplate = () => {
+    const rows = [
+      ['nombre', 'email', 'tipo', 'especialidad'],
+      ['Juan Pérez', 'juan.perez@colegio.cl', 'estudiante', 'Electrónica'],
+      ['Ana López', 'ana.lopez@colegio.cl', 'estudiante', 'Informática'],
+      ['Carlos Ramírez', 'c.ramirez@colegio.cl', 'profesor', ''],
+      ['Empresa SA', 'contacto@empresa.cl', 'empresa', ''],
+    ]
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\r\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = 'plantilla_usuarios.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   const handleFile = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -217,11 +237,15 @@ function BulkImportPanel() {
       <div style={{ fontSize:'.82rem', color:'var(--text2)', marginBottom:'.75rem', lineHeight:1.6 }}>
         Sube un archivo <strong style={{ color:'var(--text)' }}>.csv</strong> o <strong style={{ color:'var(--text)' }}>.xlsx</strong> con columnas:
         <code style={{ display:'block', background:'var(--surface2)', borderRadius:6, padding:'.4rem .7rem', marginTop:'.4rem', fontSize:'.75rem', color:'var(--text3)' }}>
-          nombre, email, tipo (estudiante/profesor/empresa), especialidad
+          nombre, email, tipo (estudiante / profesor / empresa), especialidad
         </code>
+        <div style={{ fontSize:'.72rem', color:'var(--text3)', marginTop:4 }}>
+          Tipos válidos: <strong>estudiante</strong> · <strong>profesor</strong> · <strong>empresa</strong><br/>
+          Contraseña generada: primer nombre + 2026 (ej: <em>juan2026</em>)
+        </div>
       </div>
 
-      <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+      <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
         <button
           onClick={() => fileRef.current?.click()}
           disabled={loading}
@@ -237,6 +261,17 @@ function BulkImportPanel() {
           {loading ? 'Procesando...' : 'Seleccionar archivo'}
         </button>
         <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFile} style={{ display:'none' }} />
+        <button
+          onClick={downloadTemplate}
+          style={{
+            display:'flex', alignItems:'center', gap:6,
+            padding:'9px 14px', borderRadius:9, border:'1px solid var(--border)',
+            background:'none', color:'var(--text3)',
+            fontFamily:"'Figtree',sans-serif", fontSize:'.78rem', cursor:'pointer',
+          }}
+        >
+          ↓ Descargar plantilla CSV
+        </button>
         {fileName && !loading && (
           <span style={{ fontSize:'.75rem', color:'var(--text3)' }}>{fileName}</span>
         )}
@@ -265,11 +300,20 @@ function BulkImportPanel() {
 
 // ─── Collapsible section ──────────────────────────────────────────────────────
 function Section({ title, icon: Icon, count, children, defaultOpen = true, badge }) {
-  const [open, setOpen] = useState(defaultOpen)
+  const storageKey = `admin-section-${title.replace(/\s+/g, '-').toLowerCase()}`
+  const [open, setOpen] = useState(() => {
+    const stored = localStorage.getItem(storageKey)
+    return stored !== null ? stored === 'true' : defaultOpen
+  })
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    localStorage.setItem(storageKey, String(next))
+  }
   return (
     <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden', marginBottom:'1rem' }}>
       <button
-        onClick={() => setOpen(v => !v)}
+        onClick={toggle}
         style={{
           width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
           padding:'1rem 1.25rem', background:'none', border:'none', cursor:'pointer',
@@ -299,14 +343,12 @@ function Section({ title, icon: Icon, count, children, defaultOpen = true, badge
 }
 
 // ─── User Manager ─────────────────────────────────────────────────────────────
-const ROLE_LABELS = { STUDENT:'Estudiante', STUDENT_TP:'Estudiante TP', STUDENT_EPJA:'Estudiante EPJA', COMPANY:'Empresa', ADMIN:'Admin', TEACHER:'Docente' }
+const ROLE_LABELS = { STUDENT:'Estudiante', STUDENT_TP:'Estudiante', STUDENT_EPJA:'Estudiante', COMPANY:'Empresa', ADMIN:'Admin', TEACHER:'Docente' }
 const ROLE_OPTIONS = [
-  { value:'STUDENT',      label:'Estudiante' },
-  { value:'STUDENT_TP',   label:'Estudiante TP (legacy)' },
-  { value:'STUDENT_EPJA', label:'Estudiante EPJA (legacy)' },
-  { value:'COMPANY',      label:'Empresa' },
-  { value:'TEACHER',      label:'Docente' },
-  { value:'ADMIN',        label:'Admin' },
+  { value:'STUDENT',  label:'Estudiante' },
+  { value:'COMPANY',  label:'Empresa' },
+  { value:'TEACHER',  label:'Docente' },
+  { value:'ADMIN',    label:'Admin' },
 ]
 
 function UserManager({ users, onAssignRole }) {
@@ -355,7 +397,7 @@ function UserManager({ users, onAssignRole }) {
 
 // ─── Admin Notifications Panel ────────────────────────────────────────────────
 function AdminNotifPanel({ notifications, onReadAll }) {
-  const TIPO_COLOR = { LICEO_VALIDATION: '#4da0e8', BADGE_REQUEST: '#f0bc38' }
+  const TIPO_COLOR = { LICEO_VALIDATION: '#3B6EDC', BADGE_REQUEST: '#D97706' }
   const TIPO_ICON  = { LICEO_VALIDATION: School, BADGE_REQUEST: Award }
 
   return (
@@ -738,18 +780,18 @@ export default function AdminDashboard() {
         <StatCard num={metrics?.trabajadores?.total || 0}  label="Estudiantes"/>
         <StatCard num={metrics?.empresas?.aprobadas || 0} label="Empresas" color="var(--amber-lit)"/>
         <StatCard num={metrics?.ofertas || 0}              label="Ofertas"/>
-        <StatCard num={metrics?.pendingLiceo || liceoReqs.length} label="Liceo pendientes" color="#4da0e8"/>
+        <StatCard num={metrics?.pendingLiceo || liceoReqs.length} label="C.E. pendientes" color="#3B6EDC"/>
         <StatCard num={metrics?.pendingBadges || badgeReqs.length} label="Insignias pendientes" color="#f0bc38"/>
       </div>
 
       {/* ── Row: Liceo + Badges ── */}
-      <div className="admin-g2">
+      <div className="admin-g2" style={{ alignItems: 'flex-start' }}>
 
-        <Section title="Validaciones de Liceo" icon={School} count={liceoReqs.length} badge="rgba(77,160,232,.7)">
+        <Section title="Validaciones de C.E." icon={School} count={liceoReqs.length} badge="rgba(77,160,232,.7)">
           <LiceoPanel
             requests={liceoReqs}
             onApprove={(w) => setConfirmModal({
-              label:       'Aprobar solicitud de liceo',
+              label:       'Aprobar solicitud de C.E.',
               targetName:  w.user?.nombre,
               actionLabel: 'Aprobar',
               danger:      false,
@@ -761,7 +803,7 @@ export default function AdminDashboard() {
               },
             })}
             onReject={(w) => setConfirmModal({
-              label:       'Rechazar solicitud de liceo',
+              label:       'Rechazar solicitud de C.E.',
               targetName:  w.user?.nombre,
               actionLabel: 'Rechazar',
               danger:      true,
@@ -807,7 +849,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── Row: Admin Notifications + Calendario ── */}
-      <div className="admin-g2">
+      <div className="admin-g2" style={{ alignItems: 'flex-start' }}>
 
         <Section title="Notificaciones del Sistema" icon={Bell} count={unreadNotifs} badge="rgba(190,24,93,.7)">
           <AdminNotifPanel notifications={adminNotifs} onReadAll={handleReadAll} />
@@ -819,7 +861,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── Row: Verificación empresas + Filtros ── */}
-      <div className="admin-g2">
+      <div className="admin-g2" style={{ alignItems: 'flex-start' }}>
 
         <Section title="Verificaciones de Empresa" icon={CheckCircle} count={companies.length}>
           {companies.length === 0 ? (
@@ -830,23 +872,41 @@ export default function AdminDashboard() {
                 <div style={{ fontSize:'.82rem', fontWeight:500, color:'var(--text)' }}>{c.nombreEmpresa}</div>
                 <div style={{ fontSize:'.7rem', color:'var(--text2)' }}>{c.rubro || 'Sin rubro'} · {c.user?.email}</div>
               </div>
-              <button
-                onClick={() => setConfirmModal({
-                  label:       'Aprobar empresa',
-                  targetName:  c.nombreEmpresa || c.user?.nombre,
-                  actionLabel: 'Aprobar',
-                  danger:      false,
-                  action: async (feedback) => {
-                    await adminService.approveCompany(c.id, feedback)
-                    setCompanies(r => r.filter(x => x.id !== c.id))
-                    setMetrics(m => m ? { ...m, empresas: { ...m.empresas, pendientes: Math.max((m.empresas?.pendientes || 1) - 1, 0) } } : m)
-                    toast.success('Empresa aprobada')
-                  },
-                })}
-                style={{ padding:'4px 12px', borderRadius:7, border:'1px solid rgba(77,160,232,.3)', background:'var(--green-glo)', color:'var(--green-lit)', fontSize:'.72rem', fontWeight:500, cursor:'pointer' }}
-              >
-                ✔ Verificar
-              </button>
+              <div style={{ display:'flex', gap:6 }}>
+                <button
+                  onClick={() => setConfirmModal({
+                    label:       'Rechazar verificación',
+                    targetName:  c.nombreEmpresa || c.user?.nombre,
+                    actionLabel: 'Rechazar',
+                    danger:      true,
+                    action: async (feedback) => {
+                      await adminService.rejectCompany(c.id, feedback)
+                      setCompanies(r => r.filter(x => x.id !== c.id))
+                      toast.success('Verificación rechazada')
+                    },
+                  })}
+                  style={{ padding:'4px 12px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.08)', color:'#ef4444', fontSize:'.72rem', fontWeight:500, cursor:'pointer' }}
+                >
+                  ✕ Rechazar
+                </button>
+                <button
+                  onClick={() => setConfirmModal({
+                    label:       'Aprobar empresa',
+                    targetName:  c.nombreEmpresa || c.user?.nombre,
+                    actionLabel: 'Aprobar',
+                    danger:      false,
+                    action: async (feedback) => {
+                      await adminService.approveCompany(c.id, feedback)
+                      setCompanies(r => r.filter(x => x.id !== c.id))
+                      setMetrics(m => m ? { ...m, empresas: { ...m.empresas, pendientes: Math.max((m.empresas?.pendientes || 1) - 1, 0) } } : m)
+                      toast.success('Empresa aprobada')
+                    },
+                  })}
+                  style={{ padding:'4px 12px', borderRadius:7, border:'1px solid rgba(77,160,232,.3)', background:'var(--green-glo)', color:'var(--green-lit)', fontSize:'.72rem', fontWeight:500, cursor:'pointer' }}
+                >
+                  ✔ Verificar
+                </button>
+              </div>
             </div>
           ))}
         </Section>
