@@ -109,6 +109,7 @@ export default function PublicCompanyProfile() {
                 fontFamily: "'Sora',sans-serif", fontWeight: 800,
                 fontSize: '1.6rem', color: '#fff',
                 overflow: 'hidden', flexShrink: 0,
+                position: 'relative', zIndex: 1,
               }}>
                 {company.logoUrl
                   ? <img src={company.logoUrl} alt={company.nombreEmpresa} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

@@ -3,7 +3,10 @@ const prisma = require('../utils/prisma')
 // ─── Company ──────────────────────────────────────────────────────────────────
 const getMe = async (req, res) => {
   try {
-    const c = await prisma.company.findUnique({ where: { userId: req.user.id }, include: { ofertas: true } })
+    const c = await prisma.company.findUnique({
+      where: { userId: req.user.id },
+      include: { ofertas: { include: { _count: { select: { postulaciones: true } } }, orderBy: { createdAt: 'desc' } } },
+    })
     if (!c) return res.status(404).json({ error: 'Empresa no encontrada' })
     res.json(c)
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }

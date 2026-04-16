@@ -126,14 +126,14 @@ export default function MisOfertasPage() {
               <div style={{ flex:1 }}>
                 <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:600, fontSize:'.9rem', color:'var(--text)', marginBottom:'.2rem' }}>{o.cargo}</div>
                 <div style={{ fontSize:'.75rem', color:'var(--text2)' }}>
-                  {[o.especialidadRequerida, o.disponibilidad, `${o.postulaciones?.length||0} postulantes`].filter(Boolean).join(' · ')}
+                  {[o.especialidadRequerida, o.disponibilidad, `${o._count?.postulaciones||0} postulantes`].filter(Boolean).join(' · ')}
                 </div>
               </div>
               <button
                 onClick={() => openCandidatos(o)}
                 style={{ padding:'5px 12px', borderRadius:7, border:'1px solid var(--border2)', background:'var(--surface2)', color:'var(--text2)', fontSize:'.75rem', cursor:'pointer', fontFamily:"'Figtree',sans-serif", flexShrink:0 }}
               >
-                👥 {o.postulaciones?.length || 0} candidatos
+                👥 {o._count?.postulaciones || 0} candidatos
               </button>
               <Badge label={o.activa ? 'Activa' : 'Inactiva'} color={o.activa ? 'green' : 'gray'}/>
               <BtnOutline onClick={() => toggleActiva(o)} style={{ fontSize:'.75rem', padding:'5px 12px' }}>

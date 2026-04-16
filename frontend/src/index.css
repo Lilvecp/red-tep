@@ -3,47 +3,41 @@
 @tailwind utilities;
 
 /* ─── Paleta Institucional — C.E. Cardenal José María Caro · Lo Espejo ──────
-   Azul oscuro #2A3353  +  Fondo off-white #F1F5F9
+   Azul principal #3B6EDC  +  Azul navbar #2F4FA3  +  Fondo #F5F7FB
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Fondos — tema claro */
-  --bg:        #F1F5F9;
-  --bg2:       #E8EDF4;
-  --bg3:       #DBE3EF;
+  --bg:        #F5F7FB;
+  --bg2:       #FFFFFF;
+  --bg3:       #EEF1F8;
   --surface:   #FFFFFF;
-  --surface2:  #F0F4FA;
+  --surface2:  #F5F7FB;
 
-  /* Bordes */
-  --border:    rgba(42,51,83,0.10);
-  --border2:   rgba(42,51,83,0.18);
+  --border:    #E5E7EB;
+  --border2:   #E5E7EB;
 
-  /* Azul oscuro institucional (primario) */
-  --green:     #2A3353;
-  --green-mid: #3D4E7A;
-  --green-lit: #5B72AB;
-  --green-glo: rgba(42,51,83,0.08);
+  /* Azul institucional */
+  --green:     #3B6EDC;
+  --green-mid: #3B6EDC;
+  --green-lit: #2F4FA3;
+  --green-glo: rgba(59,110,220,0.10);
 
-  /* Magenta Lo Espejo (acento) */
   --accent:    #be185d;
   --accent-lit:#ec4899;
-  --accent-bg: rgba(190,24,93,0.07);
+  --accent-bg: rgba(190,24,93,0.08);
 
-  /* Dorado — logros, validaciones, admin */
-  --amber:     #c9940c;
-  --amber-lit: #b5820a;
-  --amber-bg:  rgba(201,148,12,0.10);
+  --amber:     #D97706;
+  --amber-lit: #F59E0B;
+  --amber-bg:  rgba(217,119,6,0.08);
 
-  /* Error */
-  --red:       #dc2626;
-  --red-bg:    rgba(220,38,38,0.08);
+  --red:       #EF4444;
+  --red-bg:    rgba(239,68,68,0.08);
 
-  /* Texto — oscuro para fondo claro */
-  --text:      #1A2035;
-  --text2:     #4A5578;
-  --text3:     #8A96B5;
+  --text:      #1F2937;
+  --text2:     #6B7280;
+  --text3:     #9CA3AF;
 }
 
-/* ─── Reset & base ──────────────────────────────────────────────────────────── */
+/* ─── Reset & base ────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -55,48 +49,55 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--green); }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--green-lit); }
 
-/* ─── Animaciones ───────────────────────────────────────────────────────────── */
+/* ─── Animaciones ───────────────────────────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .6; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 }
 
-.fade-up   { animation: fadeUp  0.45s cubic-bezier(.16,1,.3,1) forwards; }
-.fade-in   { animation: fadeIn  0.35s ease forwards; }
+.fade-up { animation: fadeUp  0.45s cubic-bezier(.16,1,.3,1) forwards; }
+.fade-in { animation: fadeIn  0.35s ease forwards; }
 
-/* ─── Patrón de fondo sutil (grilla institucional) ──────────────────────────── */
+/* ─── Fondo cuadrícula ──────────────────────────────────────────────────── */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(42,51,83,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(42,51,83,0.05) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
-/* ─── Gradiente de marca ─────────────────────────────────────────────────────── */
-.brand-gradient {
-  background: linear-gradient(135deg, var(--green-mid), var(--accent-lit));
-}
+.brand-gradient { background: linear-gradient(135deg, var(--green-mid), var(--accent-lit)); }
 
-/* ─── Sombra institucional ───────────────────────────────────────────────────── */
 .glow-blue {
-  box-shadow: 0 0 24px rgba(42,51,83,0.14), 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 0 24px rgba(37,99,235,0.10), 0 4px 16px rgba(0,0,0,0.06);
 }
 
-/* ─── Feed 2 columnas (centro + derecha) ────────────────────────────────────── */
+/* ─── Focus ring accesible ──────────────────────────────────────────────── */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SISTEMA RESPONSIVO COMPLETO — Mobile First
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Feed: centro + derecha ─────────────────────────────────────────────── */
 .feed-grid {
   display: grid;
   grid-template-columns: minmax(0, 640px) 260px;
@@ -107,18 +108,249 @@ body {
   width: 100%;
 }
 .feed-col-center { grid-area: center; }
-.feed-col-right  { grid-area: right;  position: sticky; top: 1rem; }
+.feed-col-right  { grid-area: right; position: sticky; top: 1rem; }
 
 @media (max-width: 860px) {
   .feed-grid { grid-template-columns: 1fr; grid-template-areas: "center"; }
   .feed-col-right { display: none; }
 }
 
-/* ─── Focus ring accesible ──────────────────────────────────────────────────── */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--green-lit);
-  outline-offset: 2px;
+/* ── Perfil (columna fija izquierda + contenido) ────────────────────────── */
+/* Colapsa a 1 col en pantallas donde el layout total se aprieta (≤900px)   */
+.p-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .p-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Grid 2 columnas genérico ───────────────────────────────────────────── */
+.g-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .g-2 { grid-template-columns: 1fr; }
+}
+
+/* ── Grid 3 columnas ────────────────────────────────────────────────────── */
+.g-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .g-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 500px) {
+  .g-3 { grid-template-columns: 1fr; }
+}
+
+/* ── Grid 4 columnas ────────────────────────────────────────────────────── */
+.g-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .g-4 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .g-4 { grid-template-columns: 1fr; }
+}
+
+/* ── Grid 5 columnas (stats admin) ─────────────────────────────────────── */
+.g-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.85rem;
+}
+
+@media (max-width: 1100px) {
+  .g-5 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .g-5 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 400px) {
+  .g-5 { grid-template-columns: 1fr; }
+}
+
+/* ── r-grid: 2 cols que colapsa a 1 col en móvil ───────────────────────── */
+@media (max-width: 700px) {
+  .r-grid { grid-template-columns: 1fr !important; }
+  .r-hide { display: none !important; }
+}
+
+/* ── Row flex que se apila en móvil ─────────────────────────────────────── */
+.flex-row-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Botones en fila que se apilan si no caben */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── Tabla con scroll horizontal ────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrap table {
+  min-width: 480px;
+  width: 100%;
+}
+
+/* ── Imágenes y media responsivos ───────────────────────────────────────── */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Post media */
+.post-media {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .post-media { max-height: 260px; }
+}
+
+/* ── CV / Auth grids ────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cv-doc-grid  { grid-template-columns: 1fr !important; }
+  .cv-edit-grid { grid-template-columns: 1fr !important; }
+  .auth-grid    { grid-template-columns: 1fr !important; }
+  .auth-left    { display: none !important; }
+}
+
+/* ── Admin dashboard grid 2 cols ─────────────────────────────────────────── */
+.admin-g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .admin-g2 { grid-template-columns: 1fr; }
+}
+
+/* ── Section card (panel admin) ─────────────────────────────────────────── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* ── Panel de solicitudes: fila item con botones ──────────────────────────  */
+.panel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.panel-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.panel-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Progreso form grid ─────────────────────────────────────────────────── */
+.progreso-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+@media (max-width: 640px) {
+  .progreso-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Tarjeta de perfil + info (dentro de p-grid) ────────────────────────── */
+@media (max-width: 900px) {
+  /* En mobile, la columna izquierda del perfil ocupa ancho completo */
+  .profile-sidebar {
+    max-width: 100%;
+  }
+}
+
+/* ── Topbar responsive ──────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .topbar-title { display: none; }
+}
+
+/* ── Padding adaptivo en contenido ──────────────────────────────────────── */
+@media (max-width: 640px) {
+  .page-pad { padding: .75rem !important; }
+}
+
+/* ── Validaciones / insignias grid ─────────────────────────────────────── */
+.validacion-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .validacion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Landing page responsive ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .landing-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-features-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-mini-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-mini-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
