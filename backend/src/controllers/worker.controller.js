@@ -113,6 +113,56 @@ const uploadCv = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
+// PATCH /api/workers/me/modalidad
+const setModalidad = async (req, res) => {
+  try {
+    const { modalidad } = req.body
+    const valid = [null, 'BUSCANDO_PRACTICA', 'BUSCANDO_TRABAJO']
+    if (!valid.includes(modalidad ?? null))
+      return res.status(400).json({ error: 'modalidad inválida. Opciones: null, BUSCANDO_PRACTICA, BUSCANDO_TRABAJO' })
+
+    const worker = await prisma.worker.findUnique({ where: { userId: req.user.id } })
+    if (!worker) return res.status(404).json({ error: 'Perfil no encontrado' })
+    if (worker.modalidad === 'EGRESADO')
+      return res.status(400).json({ error: 'Los egresados no pueden cambiar de modalidad' })
+
+    const updated = await prisma.worker.update({
+      where: { id: worker.id },
+      data:  { modalidad: modalidad || null },
+    })
+    res.json(updated)
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
+// POST /api/workers/me/request-egreso
+const requestEgreso = async (req, res) => {
+  try {
+    const worker = await prisma.worker.findUnique({ where: { userId: req.user.id } })
+    if (!worker) return res.status(404).json({ error: 'Perfil no encontrado' })
+    if (worker.modalidad === 'EGRESADO')
+      return res.status(400).json({ error: 'Ya eres egresado' })
+    if (worker.egresadoSolicitado)
+      return res.status(400).json({ error: 'Tu solicitud ya está en revisión' })
+
+    const updated = await prisma.worker.update({
+      where: { id: worker.id },
+      data:  { egresadoSolicitado: true },
+    })
+
+    const workerNombre = req.user.nombre || 'Estudiante'
+    prisma.adminNotification.create({
+      data: {
+        tipo:         'EGRESO_REQUEST',
+        mensaje:      `${workerNombre} solicita confirmar su egreso del liceo`,
+        workerId:     worker.id,
+        workerNombre,
+      },
+    }).catch(e => console.warn('egreso notification (non-fatal):', e.message))
+
+    res.json({ message: 'Solicitud de egreso enviada al administrador', worker: updated })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error al enviar solicitud: ' + err.message }) }
+}
+
 // GET /api/workers/:id
 const getById = async (req, res) => {
   try {
@@ -134,9 +184,9 @@ const getByUserId = async (req, res) => {
 // GET /api/workers/search
 const search = async (req, res) => {
   try {
-    const { especialidad, disponibilidad, validado, nombre } = req.query
-    // `all=true` desactiva el filtro modalidad (usado por el buscador global)
-    const skipModalidadFiltro = req.query.all === 'true'
+    const { especialidad, disponibilidad, validado, nombre, modalidad: modalidadFilter } = req.query
+    const skipFiltro = req.query.all === 'true'
+
     const workers = await prisma.worker.findMany({
       where: {
         user: {
@@ -144,7 +194,9 @@ const search = async (req, res) => {
           role: { in: [...STUDENT_ROLES] },
           ...(nombre && { nombre: { contains: nombre, mode: 'insensitive' } }),
         },
-        ...(!skipModalidadFiltro && { modalidad: { not: null } }),
+        // Sin filtro explícito: solo mostrar workers con alguna modalidad activa
+        ...(!skipFiltro && !modalidadFilter && { modalidad: { not: null } }),
+        ...(modalidadFilter && { modalidad: modalidadFilter }),
         ...(especialidad   && { especialidad }),
         ...(disponibilidad && { disponibilidad }),
         ...(validado === 'true' && { validaciones: { some: {} } }),
@@ -218,4 +270,4 @@ const deleteBadgeFeedback = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
-module.exports = { getMe, updateMe, getById, getByUserId, search, requestLiceo, uploadCv, deleteLiceoFeedback, deleteBadgeFeedback }
+module.exports = { getMe, updateMe, getById, getByUserId, search, requestLiceo, uploadCv, setModalidad, requestEgreso, deleteLiceoFeedback, deleteBadgeFeedback }
