@@ -362,6 +362,40 @@ const bulkImport = async (req, res) => {
   }
 }
 
+// ─── Egreso requests ──────────────────────────────────────────────────────────
+const getEgresoRequests = async (req, res) => {
+  try {
+    const workers = await prisma.worker.findMany({
+      where: { egresadoSolicitado: true },
+      include: { user: { select: { nombre: true, email: true } } },
+      orderBy: { updatedAt: 'desc' },
+    })
+    res.json(workers)
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
+const approveEgreso = async (req, res) => {
+  try {
+    const worker = await prisma.worker.findUnique({ where: { id: Number(req.params.workerId) } })
+    if (!worker) return res.status(404).json({ error: 'Trabajador no encontrado' })
+    const updated = await prisma.worker.update({
+      where: { id: worker.id },
+      data:  { modalidad: 'EGRESADO', anioEgreso: new Date().getFullYear(), egresadoSolicitado: false },
+    })
+    res.json({ message: 'Egreso aprobado', worker: updated })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
+const rejectEgreso = async (req, res) => {
+  try {
+    const worker = await prisma.worker.update({
+      where: { id: Number(req.params.workerId) },
+      data:  { egresadoSolicitado: false },
+    })
+    res.json({ message: 'Solicitud de egreso rechazada', worker })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
 module.exports = {
   getMetrics, getPending, approveCompany, rejectCompany, getAllWorkers, createValidacion,
   getAllCompanies, verifyCompany, getAllUsers, assignRole,
@@ -369,4 +403,5 @@ module.exports = {
   getBadgeRequests, approveBadge, rejectBadge,
   getAdminNotifications, readAllAdminNotifications,
   bulkImport,
+  getEgresoRequests, approveEgreso, rejectEgreso,
 }

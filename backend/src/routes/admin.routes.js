@@ -36,6 +36,11 @@ r.get('/badge-requests',                   verifyToken, isAdmin, c.getBadgeReque
 r.put('/badge-requests/:insigniaId/approve', verifyToken, isAdmin, c.approveBadge)
 r.put('/badge-requests/:insigniaId/reject',  verifyToken, isAdmin, c.rejectBadge)
 
+// Egreso requests
+r.get('/egreso-requests',                   verifyToken, isAdmin, c.getEgresoRequests)
+r.put('/egreso-requests/:workerId/approve', verifyToken, isAdmin, c.approveEgreso)
+r.put('/egreso-requests/:workerId/reject',  verifyToken, isAdmin, c.rejectEgreso)
+
 // Admin notifications
 r.get('/notifications',                    verifyToken, isAdmin, c.getAdminNotifications)
 r.put('/notifications/read-all',           verifyToken, isAdmin, c.readAllAdminNotifications)
