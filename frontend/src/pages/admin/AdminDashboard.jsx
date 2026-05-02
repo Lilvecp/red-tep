@@ -662,6 +662,7 @@ export default function AdminDashboard() {
   const [users,        setUsers]        = useState([])
   const [liceoReqs,    setLiceoReqs]    = useState([])
   const [badgeReqs,    setBadgeReqs]    = useState([])
+  const [egresoReqs,   setEgresoReqs]   = useState([])
   const [adminNotifs,  setAdminNotifs]  = useState([])
   const [progreso,     setProgreso]     = useState([])
   const [loading,      setLoading]      = useState(true)
@@ -678,7 +679,8 @@ export default function AdminDashboard() {
       adminService.getBadgeRequests(),
       adminService.getAdminNotifications(),
       progresoService.adminGetAll(),
-    ]).then(([m, e, c, f, u, lr, br, an, pg]) => {
+      adminService.getEgresoRequests(),
+    ]).then(([m, e, c, f, u, lr, br, an, pg, er]) => {
       if (m.status  === 'fulfilled') setMetrics(m.value.data)
       if (e.status  === 'fulfilled') setEventos(e.value.data)
       if (c.status  === 'fulfilled') setCompanies(c.value.data.filter(co => co.verificationRequested && !co.verified))
@@ -688,6 +690,7 @@ export default function AdminDashboard() {
       if (br.status === 'fulfilled') setBadgeReqs(br.value.data)
       if (an.status === 'fulfilled') setAdminNotifs(an.value.data.notifications || [])
       if (pg.status === 'fulfilled') setProgreso(pg.value.data)
+      if (er.status === 'fulfilled') setEgresoReqs(er.value.data)
     }).finally(() => setLoading(false))
   }
 
@@ -847,6 +850,58 @@ export default function AdminDashboard() {
           />
         </Section>
       </div>
+
+      {/* ── Solicitudes de Egreso ── */}
+      <Section title="Solicitudes de Egreso" icon={School} count={egresoReqs.length} badge="rgba(77,160,232,.7)">
+        {egresoReqs.length === 0 ? (
+          <div style={{ fontSize:'.82rem', color:'var(--text3)', padding:'.5rem 0' }}>Sin solicitudes pendientes.</div>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {egresoReqs.map(w => (
+              <div key={w.id} className="panel-item">
+                <div className="panel-item-info">
+                  <div style={{ fontSize:'.85rem', fontWeight:600, color:'var(--text)' }}>{w.user?.nombre}</div>
+                  <div style={{ fontSize:'.72rem', color:'var(--text2)', marginTop:2 }}>{w.especialidad || 'Sin especialidad'} · {w.user?.email}</div>
+                </div>
+                <div className="panel-item-actions">
+                  <button
+                    onClick={() => setConfirmModal({
+                      label:       'Aprobar solicitud de egreso',
+                      targetName:  w.user?.nombre,
+                      actionLabel: 'Aprobar',
+                      danger:      false,
+                      action: async (feedback) => {
+                        await adminService.approveEgreso(w.id, feedback)
+                        setEgresoReqs(r => r.filter(x => x.id !== w.id))
+                        toast.success('Solicitud de egreso aprobada')
+                      },
+                    })}
+                    style={{ display:'flex', alignItems:'center', gap:4, padding:'5px 12px', borderRadius:7, border:'1px solid rgba(77,160,232,.35)', background:'var(--green-glo)', color:'var(--green-lit)', fontSize:'.75rem', fontWeight:500, cursor:'pointer' }}
+                  >
+                    <CheckCircle size={13} /> Aprobar
+                  </button>
+                  <button
+                    onClick={() => setConfirmModal({
+                      label:       'Rechazar solicitud de egreso',
+                      targetName:  w.user?.nombre,
+                      actionLabel: 'Rechazar',
+                      danger:      true,
+                      action: async (feedback) => {
+                        await adminService.rejectEgreso(w.id, feedback)
+                        setEgresoReqs(r => r.filter(x => x.id !== w.id))
+                        toast.success('Solicitud de egreso rechazada')
+                      },
+                    })}
+                    style={{ display:'flex', alignItems:'center', gap:4, padding:'5px 12px', borderRadius:7, border:'1px solid rgba(239,68,68,.25)', background:'rgba(239,68,68,.08)', color:'#ef4444', fontSize:'.75rem', fontWeight:500, cursor:'pointer' }}
+                  >
+                    <XCircle size={13} /> Rechazar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
 
       {/* ── Row: Admin Notifications + Calendario ── */}
       <div className="admin-g2" style={{ alignItems: 'flex-start' }}>
