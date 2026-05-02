@@ -23,7 +23,7 @@ const getMe = async (req, res) => {
 const WORKER_FIELDS = [
   'edad','telefono','direccion','fotoUrl','curso','especialidad','establecimiento',
   'experienciaPractica','disponibilidad','videoUrl','bannerColor','evaluacionSocioem',
-  'modalidad','anioEgreso','egresadoSolicitado','pretensionRenta','progreso','cvUrl',
+  'pretensionRenta','progreso','cvUrl',
 ]
 
 // PUT /api/workers/me
