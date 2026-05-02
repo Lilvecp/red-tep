@@ -45,6 +45,8 @@ export const workerService = {
   uploadCv:      (cvUrl)   => api.post('/workers/me/upload-cv', { cvUrl }),
   deleteLiceoFeedback: ()   => api.delete('/workers/me/liceo-feedback'),
   deleteBadgeFeedback: (id) => api.delete(`/workers/me/badges/${id}/feedback`),
+  setModalidad:  (modalidad) => api.patch('/workers/me/modalidad', { modalidad }),
+  requestEgreso: ()          => api.post('/workers/me/request-egreso'),
 }
 
 export const companyService = {
@@ -91,6 +93,10 @@ export const adminService = {
   readAllAdminNotifications:()  => api.put('/admin/notifications/read-all'),
   // Bulk import
   bulkImport:      (fd)         => api.post('/admin/bulk-import', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  // Egreso (graduation) requests
+  getEgresoRequests: ()         => api.get('/admin/egreso-requests'),
+  approveEgreso:     (workerId) => api.put(`/admin/egreso-requests/${workerId}/approve`),
+  rejectEgreso:      (workerId) => api.put(`/admin/egreso-requests/${workerId}/reject`),
 }
 
 export const badgeService = {
