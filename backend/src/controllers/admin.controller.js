@@ -6,7 +6,7 @@ const XLSX   = require('xlsx')
 const getMetrics = async (req, res) => {
   try {
     const [totalTP, totalEPJA, totalEmpresas, empresasPendientes, totalValidaciones, totalOfertas,
-      porEspecialidad, pendingLiceo, pendingBadges, unreadNotifs] = await Promise.all([
+      porEspecialidad, pendingLiceo, pendingBadges, unreadNotifs, totalPractica, totalTrabajo, totalEgresados, totalPendingEgreso] = await Promise.all([
       prisma.worker.count({ where: { user: { role: { in: ['STUDENT', 'STUDENT_TP'] }, activo: true } } }),
       prisma.worker.count({ where: { user: { role: 'STUDENT_EPJA', activo: true } } }),
       prisma.company.count({ where: { aprobada: true } }),
@@ -17,6 +17,10 @@ const getMetrics = async (req, res) => {
       prisma.worker.count({ where: { liceoValidado: 'PENDIENTE' } }),
       prisma.insignia.count({ where: { estado: 'PENDIENTE' } }),
       prisma.adminNotification.count({ where: { leida: false } }),
+      prisma.worker.count({ where: { modalidad: 'BUSCANDO_PRACTICA' } }),
+      prisma.worker.count({ where: { modalidad: 'BUSCANDO_TRABAJO' } }),
+      prisma.worker.count({ where: { modalidad: 'EGRESADO' } }),
+      prisma.worker.count({ where: { egresadoSolicitado: true } }),
     ])
 
     res.json({
@@ -28,6 +32,8 @@ const getMetrics = async (req, res) => {
       pendingLiceo,
       pendingBadges,
       unreadNotifs,
+      modalidades: { practica: totalPractica, trabajo: totalTrabajo, egresados: totalEgresados },
+      pendingEgreso: totalPendingEgreso,
     })
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
