@@ -68,8 +68,8 @@ async function main() {
       },
       insignias: {
         create: [
-          { tipo: 'PERFIL_COMPLETO' },
-          { tipo: 'EXPERIENCIA_PRACTICA' },
+          { tipo: 'PERFIL_COMPLETO',      estado: 'APROBADA' },
+          { tipo: 'EXPERIENCIA_PRACTICA', estado: 'APROBADA' },
         ]
       }
     }
@@ -97,7 +97,7 @@ async function main() {
       curso: '3er Año EPJA',
       especialidad: 'Gastronomía',
       experienciaPractica: 'Trabajo en restaurante por 2 años. Cocina chilena, repostería y BPM alimentarias.',
-      disponibilidad: 'MEDIO_TIEMPO',
+      disponibilidad: 'Medio tiempo',
       perfilCompleto: true,
       evaluacionSocioem: { responsabilidad: 5, proactividad: 4, trabajoEquipo: 5, puntualidad: 4 },
       habilidades: {
@@ -156,7 +156,7 @@ async function main() {
           descripcion: 'Buscamos ayudante eléctrico para obras en Lo Espejo y alrededores.',
           especialidadRequerida: 'Electricidad',
           comuna: 'Lo Espejo',
-          disponibilidad: 'TIEMPO_COMPLETO',
+          disponibilidad: 'Tiempo completo',
           salario: '$450.000 + Bonos',
           horario: 'Lunes a Viernes 08:00-17:00',
           requisitos: ['Conocimientos eléctricos básicos','Puntualidad','Trabajo en equipo'],
@@ -167,7 +167,7 @@ async function main() {
           descripcion: 'Se requiere técnico para mantención preventiva y correctiva de instalaciones.',
           especialidadRequerida: 'Electricidad',
           comuna: 'Santiago',
-          disponibilidad: 'TIEMPO_COMPLETO',
+          disponibilidad: 'Tiempo completo',
           salario: '$550.000',
           horario: 'Lunes a Viernes 09:00-18:00',
           requisitos: ['Experiencia en mantención','Licencia clase B (deseable)'],

@@ -48,9 +48,11 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relaciones
-  worker          Worker?
-  company         Company?
-  validaciones    Validacion[] @relation("TeacherValidaciones")
+  worker              Worker?
+  company             Company?
+  validaciones        Validacion[]         @relation("TeacherValidaciones")
+  sentMessages        Message[]            @relation("MessageSender")
+  conversationMembers ConversationMember[]
 
   @@map("users")
 }
@@ -94,7 +96,12 @@ model Worker {
 
   // Estado
   perfilCompleto           Boolean          @default(false)
-  buscandoTrabajo          Boolean          @default(true)
+
+  // Modalidad de búsqueda — reemplaza buscandoTrabajo
+  modalidad                String?          // null | BUSCANDO_PRACTICA | BUSCANDO_TRABAJO | EGRESADO
+  anioEgreso               Int?
+  egresadoSolicitado       Boolean          @default(false)
+  pretensionRenta          String?
 
   // Relaciones
   habilidades              Habilidad[]
@@ -176,6 +183,30 @@ model ProgresoUsuario {
 
   @@unique([workerId, progresoFormativoId])
   @@map("progreso_usuario")
+}
+
+model InsigniaTemplate {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  descripcion String
+  imagenUrl   String?
+  creadoEn    DateTime @default(now())
+
+  awards InsigniaAward[]
+
+  @@map("insignia_templates")
+}
+
+model InsigniaAward {
+  id         Int              @id @default(autoincrement())
+  templateId Int
+  template   InsigniaTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  userId     Int
+  visible    Boolean          @default(true)
+  otorgadoEn DateTime         @default(now())
+
+  @@unique([templateId, userId])
+  @@map("insignia_awards")
 }
 
 model AdminNotification {
@@ -363,4 +394,45 @@ model FilterOption {
 
   @@unique([tipo, valor])
   @@map("filter_options")
+}
+
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  nombre    String?
+  esGrupo   Boolean  @default(false)
+  creadoEn  DateTime @default(now())
+
+  members  ConversationMember[]
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model ConversationMember {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  userId         Int
+  unreadCount    Int          @default(0)
+  joinedAt       DateTime     @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@map("conversation_members")
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  senderId       Int
+  contenido      String       @default("")
+  mediaUrl       String?
+  eliminado      Boolean      @default(false)
+  creadoEn       DateTime     @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id])
+
+  @@map("messages")
 }

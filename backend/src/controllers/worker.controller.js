@@ -23,7 +23,7 @@ const getMe = async (req, res) => {
 const WORKER_FIELDS = [
   'edad','telefono','direccion','fotoUrl','curso','especialidad','establecimiento',
   'experienciaPractica','disponibilidad','videoUrl','bannerColor','evaluacionSocioem',
-  'buscandoTrabajo','progreso','cvUrl',
+  'modalidad','anioEgreso','egresadoSolicitado','pretensionRenta','progreso','cvUrl',
 ]
 
 // PUT /api/workers/me
@@ -135,8 +135,8 @@ const getByUserId = async (req, res) => {
 const search = async (req, res) => {
   try {
     const { especialidad, disponibilidad, validado, nombre } = req.query
-    // `all=true` desactiva el filtro buscandoTrabajo (usado por el buscador global)
-    const skipBuscandoFiltro = req.query.all === 'true'
+    // `all=true` desactiva el filtro modalidad (usado por el buscador global)
+    const skipModalidadFiltro = req.query.all === 'true'
     const workers = await prisma.worker.findMany({
       where: {
         user: {
@@ -144,7 +144,7 @@ const search = async (req, res) => {
           role: { in: [...STUDENT_ROLES] },
           ...(nombre && { nombre: { contains: nombre, mode: 'insensitive' } }),
         },
-        ...(!skipBuscandoFiltro && { buscandoTrabajo: true }),
+        ...(!skipModalidadFiltro && { modalidad: { not: null } }),
         ...(especialidad   && { especialidad }),
         ...(disponibilidad && { disponibilidad }),
         ...(validado === 'true' && { validaciones: { some: {} } }),

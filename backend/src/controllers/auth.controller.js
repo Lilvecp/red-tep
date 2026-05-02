@@ -6,11 +6,20 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 const MIN_PASS    = 8
 
 const ROLE_HOME = {
+  STUDENT:      '/feed',
   STUDENT_TP:   '/feed',
   STUDENT_EPJA: '/feed',
   COMPANY:      '/feed',
+  TEACHER:      '/feed',
   ADMIN:        '/admin',
 }
+
+// Roles que los usuarios pueden registrarse directamente
+// ADMIN no se registra — solo el seed o admin lo asigna
+const PUBLIC_ROLES = ['STUDENT', 'STUDENT_TP', 'STUDENT_EPJA', 'COMPANY', 'TEACHER']
+
+// Roles de estudiante (incluye legacy)
+const STUDENT_ROLES = ['STUDENT', 'STUDENT_TP', 'STUDENT_EPJA']
 
 const sign = (user) => jwt.sign(
   { id: user.id, email: user.email, role: user.role, nombre: user.nombre },
@@ -20,13 +29,13 @@ const sign = (user) => jwt.sign(
 
 const sanitize = (u) => ({
   id: u.id, nombre: u.nombre, email: u.email,
-  role: u.role, redirectTo: ROLE_HOME[u.role]
+  role: u.role, redirectTo: ROLE_HOME[u.role] || '/feed'
 })
 
 // POST /api/auth/register
 const register = async (req, res) => {
   try {
-    const { nombre, email, password, role } = req.body
+    let { nombre, email, password, role } = req.body
 
     if (!nombre?.trim())
       return res.status(400).json({ error: 'El nombre es requerido' })
@@ -35,28 +44,40 @@ const register = async (req, res) => {
     if (!password || password.length < MIN_PASS)
       return res.status(400).json({ error: `La contraseña debe tener al menos ${MIN_PASS} caracteres` })
 
-    const validRoles = ['STUDENT_TP', 'STUDENT_EPJA', 'COMPANY']
-    if (!validRoles.includes(role))
-      return res.status(400).json({ error: 'Rol inválido' })
+    // Normalizar rol — aceptar alias en español
+    const roleMap = {
+      estudiante: 'STUDENT',
+      student:    'STUDENT',
+      profesor:   'TEACHER',
+      teacher:    'TEACHER',
+      empresa:    'COMPANY',
+      company:    'COMPANY',
+    }
+    if (role && roleMap[role.toLowerCase()]) role = roleMap[role.toLowerCase()]
+
+    if (!PUBLIC_ROLES.includes(role))
+      return res.status(400).json({ error: `Rol inválido. Opciones: ${PUBLIC_ROLES.join(', ')}` })
 
     if (await prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } }))
       return res.status(400).json({ error: 'El correo ya está registrado' })
 
     const user = await prisma.user.create({
       data: {
-        nombre: nombre.trim(),
-        email: email.trim().toLowerCase(),
+        nombre:   nombre.trim(),
+        email:    email.trim().toLowerCase(),
         password: await bcrypt.hash(password, 10),
         role,
       }
     })
 
-    if (role === 'STUDENT_TP' || role === 'STUDENT_EPJA') {
+    // Crear perfil según rol
+    if (STUDENT_ROLES.includes(role)) {
       await prisma.worker.create({ data: { userId: user.id } })
     }
     if (role === 'COMPANY') {
       await prisma.company.create({ data: { userId: user.id, nombreEmpresa: nombre.trim() } })
     }
+    // TEACHER: no necesita perfil adicional
 
     res.status(201).json({ token: sign(user), user: sanitize(user) })
   } catch (err) {
@@ -98,8 +119,25 @@ const me = async (req, res) => {
     })
     res.json(user)
   } catch (err) {
-    console.error(err); res.status(500).json({ error: 'Error interno del servidor' })
+    console.error(err)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 }
 
-module.exports = { register, login, me }
+// PATCH /api/auth/me — actualiza nombre del usuario
+const updateMe = async (req, res) => {
+  try {
+    const { nombre } = req.body
+    if (!nombre?.trim()) return res.status(400).json({ error: 'El nombre es requerido' })
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data:  { nombre: nombre.trim() },
+    })
+    res.json({ token: sign(user), user: sanitize(user) })
+  } catch (err) {
+    console.error('updateMe error:', err.message)
+    res.status(500).json({ error: 'Error al actualizar nombre' })
+  }
+}
+
+module.exports = { register, login, me, updateMe }
