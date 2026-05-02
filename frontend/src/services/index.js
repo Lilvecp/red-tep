@@ -163,12 +163,13 @@ export const filterService = {
 }
 
 export const chatService = {
-  getConversations:   ()           => api.get('/chat/conversations'),
-  createConversation: (data)       => api.post('/chat/conversations', data),
-  getMessages:        (id, before) => api.get(`/chat/conversations/${id}/messages${before ? `?before=${before}` : ''}`),
-  markRead:           (id)         => api.put(`/chat/conversations/${id}/read`),
-  deleteMessage:      (id)         => api.delete(`/chat/messages/${id}`),
-  uploadImage:        (fd)         => api.post('/chat/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  getConversations:   ()              => api.get('/chat/conversations'),
+  createConversation: (data)          => api.post('/chat/conversations', data),
+  getMessages:        (convId, before) => api.get(`/chat/conversations/${convId}/messages`, { params: before ? { before } : {} }),
+  sendMessage:        (convId, data)  => api.post(`/chat/conversations/${convId}/messages`, data),
+  deleteMessage:      (messageId)     => api.delete(`/chat/messages/${messageId}`),
+  markRead:           (convId)        => api.post(`/chat/conversations/${convId}/read`),
+  uploadImage:        (fd)            => api.post('/chat/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
 }
 
 // Progreso Formativo — worker reads + updates own progress
