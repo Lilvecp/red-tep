@@ -14,12 +14,12 @@ export default function CandidatosPage() {
   const [workers,  setWorkers]  = useState([])
   const [specs,    setSpecs]    = useState([])
   const [loading,  setLoading]  = useState(true)
-  const [filters,  setFilters]  = useState({ especialidad: '', disponibilidad: '', nombre: '' })
+  const [filters,  setFilters]  = useState({ especialidad: '', disponibilidad: '', modalidad: '', nombre: '' })
   const [selected, setSelected] = useState(null)
 
   const load = () => {
     setLoading(true)
-    workerService.search(filters)
+    workerService.search({ ...filters, ...(filters.modalidad && { modalidad: filters.modalidad }) })
       .then(r => setWorkers(r.data.results))
       .catch(() => toast.error('Error al cargar candidatos'))
       .finally(() => setLoading(false))
@@ -90,6 +90,24 @@ export default function CandidatosPage() {
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: '.65rem' }}>
                     {w.habilidades?.slice(0, 2).map(h => <Chip key={h.id} label={h.nombre} />)}
+                  </div>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: '.65rem' }}>
+                    {w.modalidad === 'BUSCANDO_PRACTICA' && (
+                      <span style={{ display:'inline-flex', background:'rgba(59,110,220,.15)', border:'1px solid rgba(59,110,220,.3)', borderRadius:20, padding:'2px 8px', fontSize:'.65rem', color:'#3B6EDC', fontWeight:600 }}>
+                        Práctica
+                      </span>
+                    )}
+                    {w.modalidad === 'BUSCANDO_TRABAJO' && (
+                      <span style={{ display:'inline-flex', background:'rgba(34,197,94,.12)', border:'1px solid rgba(34,197,94,.25)', borderRadius:20, padding:'2px 8px', fontSize:'.65rem', color:'rgba(34,197,94,.9)', fontWeight:600 }}>
+                        Trabajo
+                      </span>
+                    )}
+                    {w.modalidad === 'EGRESADO' && (
+                      <span style={{ display:'inline-flex', background:'rgba(245,158,11,.12)', border:'1px solid rgba(245,158,11,.3)', borderRadius:20, padding:'2px 8px', fontSize:'.65rem', color:'#f59e0b', fontWeight:600 }}>
+                        Egresado {w.anioEgreso ? w.anioEgreso : ''}
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -169,6 +187,33 @@ export default function CandidatosPage() {
                       }}
                     >
                       {d.replace(/_/g, ' ')}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ fontSize: '.62rem', textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--text3)', marginBottom: '.4rem' }}>
+                Modalidad
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {['Todos', 'BUSCANDO_PRACTICA', 'BUSCANDO_TRABAJO', 'EGRESADO'].map(m => {
+                  const val    = m === 'Todos' ? '' : m
+                  const active = filters.modalidad === val
+                  const label  = m === 'Todos' ? 'Todos' : m === 'BUSCANDO_PRACTICA' ? 'Práctica' : m === 'BUSCANDO_TRABAJO' ? 'Trabajo' : 'Egresado'
+                  return (
+                    <span
+                      key={m}
+                      onClick={() => setFilters({ ...filters, modalidad: val })}
+                      style={{
+                        background: active ? 'var(--green-glo)' : 'var(--surface2)',
+                        border: `1px solid ${active ? 'rgba(77,160,232,.3)' : 'var(--border)'}`,
+                        color: active ? 'var(--green-lit)' : 'var(--text2)',
+                        fontSize: '.65rem', padding: '3px 8px', borderRadius: 10, cursor: 'pointer',
+                      }}
+                    >
+                      {label}
                     </span>
                   )
                 })}
