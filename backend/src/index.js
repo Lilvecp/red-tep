@@ -62,7 +62,9 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Error interno del servidor' })
 })
 
-const PORT = process.env.PORT || 8080
-app.listen(PORT, () => console.log(`🚀 RED TEP API corriendo en http://localhost:${PORT}`))
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 8080
+  app.listen(PORT, () => console.log(`🚀 RED TEP API corriendo en http://localhost:${PORT}`))
+}
 
 module.exports = app
