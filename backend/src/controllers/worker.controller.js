@@ -128,7 +128,8 @@ const setModalidad = async (req, res) => {
 
     const updated = await prisma.worker.update({
       where: { id: worker.id },
-      data:  { modalidad: modalidad || null },
+      data:  { modalidad: modalidad ?? null },
+      include,
     })
     res.json(updated)
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
@@ -160,7 +161,7 @@ const requestEgreso = async (req, res) => {
     }).catch(e => console.warn('egreso notification (non-fatal):', e.message))
 
     res.json({ message: 'Solicitud de egreso enviada al administrador', worker: updated })
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Error al enviar solicitud: ' + err.message }) }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
 // GET /api/workers/:id
