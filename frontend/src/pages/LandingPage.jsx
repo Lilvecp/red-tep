@@ -1,4 +1,15 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+function useIsMobile(bp = 768) {
+  const [m, setM] = useState(() => typeof window !== 'undefined' && window.innerWidth < bp)
+  useEffect(() => {
+    const h = () => setM(window.innerWidth < bp)
+    window.addEventListener('resize', h)
+    return () => window.removeEventListener('resize', h)
+  }, [bp])
+  return m
+}
 import { ArrowRight, GraduationCap, Building2, Shield, CheckCircle, Award, Users, Briefcase } from 'lucide-react'
 import RedTEPLogo from '../components/brand/RedTEPLogo'
 
@@ -94,6 +105,7 @@ function MiniFeature({ icon: Icon, label, sub }) {
 /* ─── LandingPage ─────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
   const nav = useNavigate()
+  const isMobile = useIsMobile()
 
   return (
     <div style={{ minHeight:'100vh', background:'#F5F7FB', overflow:'hidden', fontFamily:"'Figtree','DM Sans',sans-serif" }}>
@@ -133,7 +145,7 @@ export default function LandingPage() {
 
       {/* ══ HERO ═══════════════════════════════════════════════════════════════ */}
       <section style={{ position:'relative', zIndex:1, maxWidth:1140, margin:'0 auto', padding:'clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,2.5rem) clamp(3rem,6vw,5rem)' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'clamp(2rem,5vw,4.5rem)', alignItems:'center' }}>
+        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap:'clamp(2rem,5vw,4.5rem)', alignItems:'center' }}>
 
           {/* ── Texto hero ── */}
           <div>
@@ -323,7 +335,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1.5rem', marginBottom:'3.25rem' }}>
+        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap:'1.5rem', marginBottom:'3.25rem' }}>
           <ProfileCard icon={GraduationCap} title="Estudiante Activo o Egresado"
             desc="Crea tu perfil técnico validado, genera tu CV en 1 clic, recibe insignias aprobadas por el admin y accede a oportunidades reales del territorio."
             active />
@@ -334,7 +346,7 @@ export default function LandingPage() {
         </div>
 
         {/* Mini features */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'1rem' }}>
+        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4,1fr)', gap:'1rem' }}>
           <MiniFeature icon={CheckCircle} label="Registro estudiantil"   sub="Admin aprueba cada estudiante"/>
           <MiniFeature icon={Award}       label="Insignias con control" sub="El admin aprueba cada logro"/>
           <MiniFeature icon={Users}       label="Importación masiva"    sub="Carga Excel/CSV de usuarios"/>
@@ -407,20 +419,6 @@ export default function LandingPage() {
         </span>
       </footer>
 
-      {/* ── Animaciones ─────────────────────────────────────────────────────── */}
-      <style>{`
-        @media(max-width:768px){
-          section > div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns:1fr !important;
-          }
-          section > div > div[style*="grid-template-columns: repeat(3"] {
-            grid-template-columns:1fr !important;
-          }
-          section > div > div[style*="grid-template-columns: repeat(4"] {
-            grid-template-columns:1fr 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }
