@@ -13,3 +13,5 @@ logs/
 backend/src/prisma/migrations/
 .claude/
 CLAUDE.md
+INFORME_FINAL_RedTEP.docx
+docs/superpowers/
