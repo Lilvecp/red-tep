@@ -384,28 +384,6 @@ export default function AuthPage() {
                 >
                   {lf.formState.isSubmitting ? 'Ingresando...' : 'Ingresar'}
                 </button>
-
-                {/* Demo */}
-                <div style={{ marginTop:'1.5rem', paddingTop:'1rem', borderTop:'1px solid var(--border)' }}>
-                  <div style={{ fontSize:'.68rem', color:'var(--text3)', marginBottom:'.5rem', textTransform:'uppercase', letterSpacing:'.06em' }}>Acceso rápido (demo)</div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                    {[
-                      ['admin@redtep.cl',        'admin123', 'Admin Colegio'],
-                      ['juan@redtep.cl',          'est123',   'Estudiante'],
-                      ['empresa@constructora.cl', 'emp123',   'Empresa'],
-                    ].map(([e, p, l]) => (
-                      <button key={e} type="button"
-                        onClick={() => { lf.setValue('email',e); lf.setValue('password',p) }}
-                        style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 10px', background:'var(--surface2)', border:'1px solid var(--border)', borderRadius:7, color:'var(--text2)', fontFamily:"'Figtree',sans-serif", fontSize:'.74rem', cursor:'pointer' }}
-                        onMouseEnter={e=>e.currentTarget.style.borderColor='rgba(77,160,232,.3)'}
-                        onMouseLeave={e=>e.currentTarget.style.borderColor='var(--border)'}
-                      >
-                        <span>{l}</span>
-                        <span style={{ color:'var(--text3)', fontSize:'.68rem' }}>{e}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </form>
             ) : (
               /* ── Formulario de registro ── */
