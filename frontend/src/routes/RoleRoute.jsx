@@ -2,10 +2,11 @@ import { Navigate, Outlet } from 'react-router-dom'
 import useAuthStore from '../store/authStore'
 
 const ROLE_HOME = {
-  STUDENT_TP:   '/perfil',
-  STUDENT_EPJA: '/perfil',
-  COMPANY:      '/candidatos',
-  TEACHER:      '/admin',
+  STUDENT:      '/feed',
+  STUDENT_TP:   '/feed',
+  STUDENT_EPJA: '/feed',
+  COMPANY:      '/feed',
+  TEACHER:      '/feed',
   ADMIN:        '/admin',
 }
 

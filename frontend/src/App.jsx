@@ -1,54 +1,64 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import useAuthStore from './store/authStore'
+import { ChatProvider } from './context/ChatContext'
 
-// Páginas públicas
+// Públicas
 import LandingPage from './pages/LandingPage'
 import AuthPage    from './pages/AuthPage'
 
-// Páginas para todos los roles autenticados
+// Todos los roles autenticados
 import FeedPage    from './pages/FeedPage'
 import EventosPage from './pages/EventosPage'
 import ProfilePage from './pages/ProfilePage'
 
-// Trabajador / Estudiante
+// Estudiante
 import OfertasPage         from './pages/worker/OfertasPage'
 import OfertaDetalle       from './pages/worker/OfertaDetalle'
 import PublicWorkerProfile from './pages/worker/PublicWorkerProfile'
+import CVPage              from './pages/worker/CVPage'
 
 // Empresa
-import CandidatosPage        from './pages/company/CandidatosPage'
-import PublicCompanyProfile  from './pages/company/PublicCompanyProfile'
+import CandidatosPage       from './pages/company/CandidatosPage'
+import PublicCompanyProfile from './pages/company/PublicCompanyProfile'
+import MisOfertasPage       from './pages/company/MisOfertasPage'
 
 // Admin
-import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminDashboard   from './pages/admin/AdminDashboard'
+import ValidacionesPage from './pages/admin/ValidacionesPage'
 
 // Guards
 import PrivateRoute from './routes/PrivateRoute'
 import RoleRoute    from './routes/RoleRoute'
 
-const WORKER_ROLES  = ['STUDENT_TP', 'STUDENT_EPJA']
+// STUDENT = nuevo rol unificado; STUDENT_TP/STUDENT_EPJA = legacy
+export const STUDENT_ROLES = ['STUDENT', 'STUDENT_TP', 'STUDENT_EPJA']
 const COMPANY_ROLES = ['COMPANY']
 const ADMIN_ROLES   = ['ADMIN']
-const ALL_ROLES     = [...WORKER_ROLES, ...COMPANY_ROLES, ...ADMIN_ROLES]
+const ALL_ROLES     = [...STUDENT_ROLES, ...COMPANY_ROLES, ...ADMIN_ROLES, 'TEACHER']
 
 function HomeRedirect() {
-  const { isAuthenticated } = useAuthStore()
-  return isAuthenticated ? <Navigate to="/feed" replace /> : <LandingPage />
+  const { isAuthenticated, user } = useAuthStore()
+  if (!isAuthenticated) return <LandingPage />
+  if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
+  return <Navigate to="/feed" replace />
 }
 
 export default function App() {
   return (
+    <ChatProvider>
     <BrowserRouter>
       <Toaster
         position="top-right"
         toastOptions={{
           style: {
-            background: '#142040',
-            color: '#ddeaf8',
-            border: '1px solid rgba(77,160,232,0.18)',
+            background: '#FFFFFF', color: '#1A2035',
+            border: '1px solid rgba(42,51,83,0.15)',
             fontFamily: "'Figtree','DM Sans',sans-serif",
-          }
+            boxShadow: '0 4px 16px rgba(42,51,83,0.12)',
+          },
+          success: { iconTheme: { primary: '#2A3353', secondary: '#FFFFFF' } },
+          error:   { iconTheme: { primary: '#dc2626', secondary: '#FFFFFF' } },
         }}
       />
       <Routes>
@@ -61,27 +71,34 @@ export default function App() {
 
           {/* Todos los roles */}
           <Route element={<RoleRoute roles={ALL_ROLES} />}>
-            <Route path="/feed"                    element={<FeedPage />} />
-            <Route path="/eventos"                 element={<EventosPage />} />
-            <Route path="/perfil"                  element={<ProfilePage />} />
-            <Route path="/trabajadores/:id"        element={<PublicWorkerProfile />} />
-            <Route path="/empresas/:userId"        element={<PublicCompanyProfile />} />
+            <Route path="/feed"             element={<FeedPage />} />
+            <Route path="/eventos"          element={<EventosPage />} />
+            <Route path="/perfil"           element={<ProfilePage />} />
+            <Route path="/trabajadores/:id" element={<PublicWorkerProfile />} />
+            <Route path="/empresas/:userId" element={<PublicCompanyProfile />} />
           </Route>
 
           {/* Estudiantes */}
-          <Route element={<RoleRoute roles={WORKER_ROLES} />}>
+          <Route element={<RoleRoute roles={STUDENT_ROLES} />}>
             <Route path="/ofertas"     element={<OfertasPage />} />
             <Route path="/ofertas/:id" element={<OfertaDetalle />} />
+            <Route path="/mi-cv"       element={<CVPage />} />
           </Route>
 
           {/* Empresa */}
           <Route element={<RoleRoute roles={COMPANY_ROLES} />}>
-            <Route path="/candidatos" element={<CandidatosPage />} />
+            <Route path="/candidatos"  element={<CandidatosPage />} />
+            <Route path="/mis-ofertas" element={<MisOfertasPage />} />
           </Route>
 
-          {/* Admin */}
+          {/* Admin (panel completo) */}
           <Route element={<RoleRoute roles={ADMIN_ROLES} />}>
             <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
+
+          {/* Admin + Docente */}
+          <Route element={<RoleRoute roles={['ADMIN', 'TEACHER']} />}>
+            <Route path="/admin/validaciones" element={<ValidacionesPage />} />
           </Route>
 
         </Route>
@@ -90,5 +107,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </ChatProvider>
   )
 }

@@ -172,3 +172,5 @@ export function EmptyState({ icon: Icon, message='Sin datos disponibles' }) {
     </div>
   )
 }
+
+export { default as BadgePill } from './BadgePill'

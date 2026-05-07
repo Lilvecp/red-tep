@@ -82,7 +82,7 @@ function EventCardFeed({ evento, likeState, onLike, onComment }) {
     }}>
       {/* Etiqueta evento */}
       <div style={{
-        background: 'linear-gradient(90deg, var(--green) 0%, #1a3a6e 100%)',
+        background: 'linear-gradient(90deg, #3B6EDC 0%, #2F4FA3 100%)',
         padding: '4px 14px', display: 'flex', alignItems: 'center', gap: 6,
       }}>
         <Calendar size={12} color="rgba(255,255,255,.8)" />
@@ -328,7 +328,7 @@ function CompanyRecoCard({ companies }) {
           }}>
             <div style={{
               width: 30, height: 30, borderRadius: 7,
-              background: 'linear-gradient(135deg,#1a4f8c,#2d6a8c)',
+              background: 'linear-gradient(135deg,#3B6EDC,#2F4FA3)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: '.65rem', color: '#fff',
               flexShrink: 0,

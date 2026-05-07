@@ -11,7 +11,7 @@ function formatDate(iso) {
   return d.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-const AUTHOR_COLOR = { STUDENT: 'var(--green)', COMPANY: '#2d6a8c', ADMIN: 'var(--amber)' }
+const AUTHOR_COLOR = { STUDENT: 'var(--green)', COMPANY: '#3B6EDC', ADMIN: 'var(--amber)' }
 const AUTHOR_LABEL = { STUDENT: 'Estudiante', COMPANY: 'Empresa', ADMIN: 'Admin' }
 const AUTHOR_BADGE = { STUDENT: 'green', COMPANY: 'green', ADMIN: 'amber' }
 
@@ -102,6 +102,7 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
         .catch(() => toast.error('Error al cargar comentarios'))
         .finally(() => setLoadingC(false))
     }
+    // Once opened, keep open (user must click again only to toggle off if they want)
     setExpanded(v => !v)
   }
 
@@ -206,8 +207,8 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
       {post.mediaUrl && (
         <div style={{ borderTop: '1px solid var(--border)', borderBottom: hasText || editing ? '1px solid var(--border)' : 'none' }}>
           {post.mediaType === 'video'
-            ? <video src={post.mediaUrl} style={{ width: '100%', maxHeight: 420, objectFit: 'cover', display: 'block' }} controls />
-            : <img src={post.mediaUrl} alt="media" style={{ width: '100%', maxHeight: 420, objectFit: 'cover', display: 'block' }} />
+            ? <video src={post.mediaUrl} className="post-media" style={{ width: '100%', maxHeight: 420, objectFit: 'cover', display: 'block' }} controls />
+            : <img src={post.mediaUrl} alt="media" className="post-media" style={{ width: '100%', maxHeight: 420, objectFit: 'cover', display: 'block' }} />
           }
         </div>
       )}
@@ -241,109 +242,120 @@ export default function PostCard({ post, onDeleted, onUpdated }) {
         </div>
       )}
 
-      {/* Barra de acciones */}
+      {/* Barra de acciones — estilo LinkedIn */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '.55rem 1.25rem', borderTop: '1px solid var(--border)',
-        background: 'var(--surface2)',
+        display: 'flex', alignItems: 'center', gap: 4,
+        padding: '.35rem .75rem', borderTop: '1px solid var(--border)',
       }}>
         <button
           onClick={handleReaction}
           style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: reaction.reacted ? 'var(--green-glo)' : 'transparent',
-            border: `1px solid ${reaction.reacted ? 'rgba(77,160,232,.3)' : 'var(--border)'}`,
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+            background: 'transparent', border: 'none',
             color: reaction.reacted ? 'var(--green-lit)' : 'var(--text2)',
-            borderRadius: 20, padding: '4px 12px', cursor: 'pointer',
-            fontSize: '.78rem', fontWeight: 500, transition: 'all .2s',
+            borderRadius: 8, padding: '8px 4px', cursor: 'pointer',
+            fontSize: '.78rem', fontWeight: reaction.reacted ? 600 : 400, transition: 'all .15s',
           }}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <ThumbsUp size={13}/> {reaction.count > 0 && <span>{reaction.count}</span>}
+          <ThumbsUp size={15} style={{ fill: reaction.reacted ? 'var(--green-lit)' : 'none' }}/>
+          <span>{reaction.reacted ? 'Me gusta' : 'Me gusta'}{reaction.count > 0 && ` · ${reaction.count}`}</span>
         </button>
 
         <button
           onClick={handleExpandComments}
           style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: 'transparent', border: '1px solid var(--border)',
-            color: 'var(--text2)', borderRadius: 20, padding: '4px 12px',
-            cursor: 'pointer', fontSize: '.78rem', fontWeight: 500,
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+            background: expanded ? 'var(--surface2)' : 'transparent', border: 'none',
+            color: expanded ? 'var(--green-lit)' : 'var(--text2)',
+            borderRadius: 8, padding: '8px 4px', cursor: 'pointer',
+            fontSize: '.78rem', fontWeight: 400, transition: 'all .15s',
           }}
+          onMouseEnter={e => { if (!expanded) e.currentTarget.style.background = 'var(--surface2)' }}
+          onMouseLeave={e => { if (!expanded) e.currentTarget.style.background = 'transparent' }}
         >
-          <MessageCircle size={13}/> {expanded ? 'Cerrar' : 'Comentar'}
+          <MessageCircle size={15}/>
+          <span>Comentar{comments.length > 0 && ` · ${comments.length}`}</span>
         </button>
       </div>
 
-      {/* Comentarios */}
+      {/* Sección de comentarios — se mantiene abierta una vez expandida */}
       {expanded && (
-        <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid var(--border)' }}>
-          {/* Input */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: '1rem', alignItems: 'flex-start' }}>
+        <div style={{ borderTop: '1px solid var(--border)', padding: '.9rem 1.1rem 1rem' }}>
+          {/* Lista de comentarios */}
+          {loadingC ? (
+            <div style={{ fontSize: '.8rem', color: 'var(--text3)', padding: '.25rem 0 .75rem' }}>Cargando comentarios...</div>
+          ) : comments.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: '1rem' }}>
+              {comments.map(c => (
+                <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <Avatar nombre={c.authorName} size={30} bg={AUTHOR_COLOR[c.authorType] || 'var(--green)'} />
+                  <div style={{ flex: 1, background: 'var(--surface2)', borderRadius: 12, padding: '7px 12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontSize: '.76rem', fontWeight: 600, color: 'var(--text)' }}>{c.authorName}</span>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <span style={{ fontSize: '.62rem', color: 'var(--text3)' }}>{formatDate(c.createdAt)}</span>
+                        {(user?.id === c.authorId || isAdmin) && (
+                          <button
+                            onClick={() => handleDeleteComment(c.id)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display:'flex', alignItems:'center', padding: '0 2px' }}
+                          >
+                            <X size={11} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '.82rem', color: 'var(--text2)', lineHeight: 1.5 }}>{c.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ fontSize: '.78rem', color: 'var(--text3)', padding: '.2rem 0 .75rem' }}>
+              Sin comentarios aún. ¡Sé el primero!
+            </div>
+          )}
+
+          {/* Input de comentario — siempre visible al fondo */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <Avatar
               nombre={user?.nombre}
               size={32}
               bg={AUTHOR_COLOR[user?.role === 'COMPANY' ? 'COMPANY' : user?.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'] || 'var(--green)'}
             />
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, position: 'relative' }}>
               <input
                 value={commentDraft}
                 onChange={e => setCommentDraft(e.target.value)}
                 placeholder="Escribe un comentario..."
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment() } }}
                 style={{
-                  width: '100%', padding: '8px 12px', borderRadius: 20,
+                  width: '100%', padding: '9px 44px 9px 14px', borderRadius: 20,
                   background: 'var(--surface2)', border: '1px solid var(--border2)',
                   color: 'var(--text)', fontFamily: "'Figtree','DM Sans',sans-serif",
-                  fontSize: '.82rem', outline: 'none', boxSizing: 'border-box',
+                  fontSize: '.83rem', outline: 'none', boxSizing: 'border-box',
+                  transition: 'border-color .15s',
                 }}
+                onFocus={e => e.target.style.borderColor = 'rgba(77,160,232,.4)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border2)'}
               />
+              <button
+                onClick={handleComment}
+                disabled={sending || !commentDraft.trim()}
+                style={{
+                  position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
+                  background: commentDraft.trim() ? 'var(--green-mid)' : 'transparent',
+                  border: 'none', color: commentDraft.trim() ? '#fff' : 'var(--text3)',
+                  borderRadius: '50%', width: 28, height: 28, cursor: commentDraft.trim() ? 'pointer' : 'default',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all .15s',
+                }}
+              >
+                <MessageCircle size={13}/>
+              </button>
             </div>
-            <button
-              onClick={handleComment}
-              disabled={sending || !commentDraft.trim()}
-              style={{
-                background: 'var(--green-mid)', border: 'none', color: '#fff',
-                borderRadius: 20, padding: '8px 14px', cursor: 'pointer',
-                fontSize: '.78rem', opacity: (!commentDraft.trim() || sending) ? .5 : 1,
-              }}
-            >
-              Enviar
-            </button>
           </div>
-
-          {/* Lista */}
-          {loadingC ? (
-            <div style={{ fontSize: '.8rem', color: 'var(--text3)', padding: '.5rem 0' }}>Cargando...</div>
-          ) : comments.length === 0 ? (
-            <div style={{ fontSize: '.8rem', color: 'var(--text3)', textAlign: 'center', padding: '.5rem 0' }}>
-              Sin comentarios aún. ¡Sé el primero!
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {comments.map(c => (
-                <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                  <Avatar nombre={c.authorName} size={30} bg={AUTHOR_COLOR[c.authorType] || 'var(--green)'} />
-                  <div style={{ flex: 1, background: 'var(--surface2)', borderRadius: 10, padding: '7px 10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '.75rem', fontWeight: 600, color: 'var(--text)' }}>{c.authorName}</span>
-                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                        <span style={{ fontSize: '.65rem', color: 'var(--text3)' }}>{formatDate(c.createdAt)}</span>
-                        {(user?.id === c.authorId || isAdmin) && (
-                          <button
-                            onClick={() => handleDeleteComment(c.id)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', display:'flex', alignItems:'center', padding: '0 2px' }}
-                          >
-                            <X size={12} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <p style={{ margin: '4px 0 0', fontSize: '.82rem', color: 'var(--text2)', lineHeight: 1.5 }}>{c.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
     </div>
