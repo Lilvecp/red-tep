@@ -8,7 +8,7 @@
 
 | Servicio | URL |
 |----------|-----|
-| **Aplicación web** | https://red-tep-frontend-fn3o585wa-lilvecps-projects.vercel.app |
+| **Aplicación web** | https://red-tep-frontend.vercel.app |
 | **API Backend** | https://red-tep-backend-qtm4prr84-lilvecps-projects.vercel.app |
 
 ### Credenciales de prueba
