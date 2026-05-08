@@ -177,9 +177,9 @@ chore:     configuración
 
 | Persona | Rol |
 |---------|-----|
-| Valentín Castro | P3 — Fullstack + QA + Deploy |
-| Miguel Figueroa | P1 — Frontend React |
-| Sebastián Bunzli | P2 — Backend Node.js |
+| Miguel Figueroa | P1 — Backend Node.js |
+| Valentín Castro | P2 — Frontend React |
+| Sebastián Bunzli | P3 — Documentación |
 
 ---
 

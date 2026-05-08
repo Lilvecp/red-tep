@@ -19,8 +19,12 @@ function useMobile(breakpoint = 768) {
 }
 
 // ─── Buscador global ──────────────────────────────────────────────────────────
+const SEARCH_ROLES = ['COMPANY', 'ADMIN', 'TEACHER']
+
 function GlobalSearch({ onSelect }) {
   const navigate   = useNavigate()
+  const { user }   = useAuthStore()
+  const canSearchWorkers = SEARCH_ROLES.includes(user?.role)
   const [q,        setQ]        = useState('')
   const [results,  setResults]  = useState({ workers: [], companies: [] })
   const [open,     setOpen]     = useState(false)
@@ -29,10 +33,11 @@ function GlobalSearch({ onSelect }) {
 
   const doSearch = async (val) => {
     if (!val.trim()) { setResults({ workers: [], companies: [] }); setOpen(false); return }
-    const [w, c] = await Promise.allSettled([
-      workerService.search({ nombre: val, all: 'true' }),
+    const promises = [
+      canSearchWorkers ? workerService.search({ nombre: val, all: 'true' }) : Promise.resolve({ data: { results: [] } }),
       companyService.search(val),
-    ])
+    ]
+    const [w, c] = await Promise.allSettled(promises)
     const workers   = w.status === 'fulfilled' ? (w.value.data.results || []).slice(0, 4) : []
     const companies = c.status === 'fulfilled' ? (c.value.data || []).slice(0, 4) : []
     setResults({ workers, companies })
@@ -298,10 +303,9 @@ function NotificationBell() {
 function SidebarContent({ onNavClick }) {
   const navigate    = useNavigate()
   const loc         = useLocation()
-  const { user, logout, photoUrl, setPhotoUrl } = useAuthStore()
+  const { user, logout, photoUrl, setPhotoUrl, followStats, setFollowStats } = useAuthStore()
   const { common, extra } = getMenus(user?.role)
   const [companyVerified, setCompanyVerified] = useState(false)
-  const [followStats,     setFollowStats]     = useState({ followers: 0, following: 0 })
 
   useEffect(() => {
     if (user?.role === 'COMPANY') {
@@ -309,12 +313,15 @@ function SidebarContent({ onNavClick }) {
         .then(r => { setCompanyVerified(r.data.verified); if (r.data.logoUrl) setPhotoUrl(r.data.logoUrl) })
         .catch(() => {})
     }
-    if (['STUDENT', 'STUDENT_TP', 'STUDENT_EPJA'].includes(user?.role)) {
+    if (['STUDENT', 'STUDENT_TP', 'STUDENT_EPJA'].includes(user?.role) && !photoUrl) {
       workerService.getMe()
         .then(r => { if (r.data.fotoUrl) setPhotoUrl(r.data.fotoUrl) })
         .catch(() => {})
     }
-    followService.getMyStats().then(r => setFollowStats(r.data)).catch(() => {})
+    // Solo fetch si aún no hay datos (evita refetch en cada navegación)
+    if (followStats.followers === 0 && followStats.following === 0) {
+      followService.getMyStats().then(r => setFollowStats(r.data)).catch(() => {})
+    }
   }, [user?.role])
 
   const handleLogout  = () => { logout(); toast.success('Sesión cerrada'); navigate('/') }

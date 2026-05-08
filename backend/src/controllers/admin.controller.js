@@ -149,6 +149,20 @@ const assignRole = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
 }
 
+const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body
+    if (!password || password.length < 6) return res.status(400).json({ error: 'Contraseña mínimo 6 caracteres' })
+    const hashed = await bcrypt.hash(password, 10)
+    const user = await prisma.user.update({
+      where: { id: Number(req.params.id) },
+      select: { id: true, email: true, nombre: true },
+      data: { password: hashed },
+    })
+    res.json({ message: 'Contraseña actualizada', user })
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Error interno del servidor' }) }
+}
+
 // ─── Liceo Validation ─────────────────────────────────────────────────────────
 
 // GET /api/admin/liceo-requests  — Pending liceo validations
@@ -410,4 +424,5 @@ module.exports = {
   getAdminNotifications, readAllAdminNotifications,
   bulkImport,
   getEgresoRequests, approveEgreso, rejectEgreso,
+  resetPassword,
 }

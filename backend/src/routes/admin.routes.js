@@ -25,6 +25,7 @@ r.post('/validaciones',                    verifyToken, isAdmin, c.createValidac
 // Users
 r.get('/users',                            verifyToken, isAdmin, c.getAllUsers)
 r.put('/users/:id/role',                   verifyToken, isAdmin, c.assignRole)
+r.put('/users/:id/reset-password',         verifyToken, isAdmin, c.resetPassword)
 
 // Liceo requests
 r.get('/liceo-requests',                   verifyToken, isAdmin, c.getLiceoRequests)

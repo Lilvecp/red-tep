@@ -2,7 +2,7 @@ const r = require('express').Router()
 const c = require('../controllers/worker.controller')
 const { verifyToken, isWorker, isCompany, isAdmin, isAny } = require('../middleware/auth.middleware')
 
-// Búsqueda — solo empresa y admin
+// Búsqueda — solo empresa, admin y docente
 r.get('/search', verifyToken, (req,res,next) => {
   const allowed = ['COMPANY','ADMIN','TEACHER']
   if (!allowed.includes(req.user?.role)) return res.status(403).json({ error: 'Acceso denegado' })
